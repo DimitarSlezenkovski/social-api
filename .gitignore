@@ -1,2 +1,7 @@
 venv
 .idea
+bin
+__pycache__
+include/site/python3.8/greenlet
+lib/python3.8/site-packages
+
