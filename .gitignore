@@ -1,2 +1,6 @@
 venv
 .idea
+bin
+__pycache__
+include
+lib
