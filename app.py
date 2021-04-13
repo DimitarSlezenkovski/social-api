@@ -3,6 +3,10 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
 
+def get_test1(test1_id):
+    return {'id': 1, 'name': 'name', 'entered_id': test1_id}
+
+
 connexion_app = connexion.App(__name__, specification_dir="./")
 app = connexion_app.app
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/social-db'
