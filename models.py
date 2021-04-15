@@ -32,6 +32,27 @@ class User(db.Model, BaseEntity):
     posts = db.relationship('Post', backref='user')
     messages = db.relationship('Message', backref='user')
     party_member = db.relationship('CyclePartyMember', backref='user', useList=False)
+    profile_pic = db.relationship('ProfileImage', backref='user', useList=False)
+    images = db.relationship('Image', backref='user')
+
+
+class Image(db.Model, BaseEntity):
+    __tablename__ = "user_images"
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    image_url = db.Column(db.String)
+
+
+class PostImage(db.Model, BaseEntity):
+    __tablename__ = 'post_images'
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
+    image_url = db.Column(db.String)
+
+
+class ProfileImage(db.Model, BaseEntity):
+    __tablename__ = "profile_images"
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    profilePictureUrl = db.Column(db.String)
+    is_profile_picture = db.Column(db.Boolean)
 
 
 class Friend(db.Model, BaseEntity):
@@ -74,7 +95,7 @@ class Post(db.Model, BaseEntity):
     userid = db.Column(db.Integer, db.ForeignKey('users.id'))
     text = db.Column(db.String)
     type = db.Column(db.String)
-    image = db.Column(db.String)
+    images = db.relationship('PostImage', backref='post')
     route = db.relationship('CycledRoute', backref='post', useList=False)
     created_on = db.Column(DateTime)
     comments = db.relationship("Comment", backref='post')
