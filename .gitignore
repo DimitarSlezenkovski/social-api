@@ -3,4 +3,4 @@ __pycache__
 .idea
 bin
 include
-lib/python3.8/site-packages
+lib
