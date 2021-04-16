@@ -29,8 +29,7 @@ class Post(db.Model):
     id = db.Column(db.BigInteger, nullable = False ,default=generatedId.int, primary_key = True)
     userId = db.Column(db.BigInteger, nullable = False)
     text = db.Column(db.String, nullable = False)
-    #image ?
-    #route ? 
+    # image ?
     comments = db.relationship("Comment", backref = 'post')
     createdOn = db.Column(db.Date)
 
@@ -49,13 +48,13 @@ class Route(db.Model):
     id = db.Column(db.BigInteger, nullable = False ,default=generatedId.int, primary_key = True)
     lng = db.Column(db.String, nullable = False)
     lat = db.Column(db.String, nullable = False)
-    cycled_routes = db.relationship("CycledRoute", backref= 'post')
-    cycle_parties = db.relationship("CycleParty", backref= 'post')
 
 class CycledRoute(db.Model):
     __tablename__ = 'cycled_routes'
     generatedId = uuid.uuid1()
     id = db.Column(db.BigInteger, nullable = False ,default=generatedId.int, primary_key = True)
+    #the userId here is needed to see each user's cycled routes
+    userId = db.Column(db.BigInteger, nullable = False, primary_key = True)
     distanceTraveled = db.Column(db.String, nullable = False)
     caloriesBurned = db.Column(db.BigInteger)
     route = db.Column(db.BigInteger, db.ForeignKey('route.id'), nullable = False)
