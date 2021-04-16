@@ -31,7 +31,7 @@ class Post(db.Model):
     text = db.Column(db.String, nullable = False)
     # image ?
     comments = db.relationship("Comment", backref = 'post')
-    createdOn = db.Column(db.Date)
+    createdOn = db.Column(db.DateTime, nullable = False)
 
 class Comment(db.Model):
     __tablename__ = 'comments'
@@ -40,7 +40,7 @@ class Comment(db.Model):
     postId = db.Column(db.String, db.ForeignKey('posts.id'))
     userId = db.Column(db.BigInteger, nullable = False)
     text = db.Column(db.String, nullable = False)
-    createdOn = db.Column(db.DateTime)
+    createdOn = db.Column(db.DateTime, nullable = False)
 
 class Route(db.Model):
     __tablename__ = 'route'

@@ -9,6 +9,46 @@ produces:
   - application/json
 basePath: "/api"
 paths:
+  
+  /leaveParty/:
+    post:
+      tags : [ LeaveParty ]
+      operationId : app.leaveParty
+      summary : Leaving a cycling party
+      parameters : 
+        - $ref : '#/parameters/leavePartyBody'
+      responses : 
+        200 :
+          description : OK
+        500 :
+          description : Internal server error
+
+  /postComment/:
+    post:
+      tags : [ PostComment ]
+      operationId : app.postComment
+      summary : Posting a comment to an existing post
+      parameters : 
+          - $ref : '#/parameters/commentBody'
+      responses : 
+        200 : 
+          description : OK
+        500 : 
+          description : Internal server error
+
+  /createPost/:
+    post:
+      tags : [ CreatePost ]
+      operationId : app.createPost
+      summary : Creating a new post
+      parameters : 
+        - $ref : '#/parameters/postBody'
+      responses :
+        200 : 
+          description : OK
+        500 : 
+          description : Internal server error
+
   /createRoute/:
     post:
       tags : [ CreateRoute ]
@@ -150,3 +190,48 @@ parameters:
           type : string
         lat : 
           type : string
+
+  postBody:
+    name : postBody
+    description : This will create a new post (not the http method haha)
+    in : body
+    schema : 
+      required : 
+        - userId
+        - text
+      properties :
+        userId : 
+          type : integer
+        text : 
+          type : string
+
+  commentBody : 
+    name : commentBody
+    description : This will post a comment to an existing post
+    in : body
+    schema : 
+      required : 
+        - postId
+        - userId
+        - text
+      properties : 
+        postId :
+          type : string
+        userId :
+          type : integer
+        text : 
+          type : string
+  
+  leavePartyBody : 
+    name : leavePartyBody
+    description : This is used when someone wants to leave a party
+    in : body 
+    schema : 
+      required :
+        - partyId 
+        - userId
+      properties : 
+        partyId : 
+          type : string
+        userId : 
+          type : integer

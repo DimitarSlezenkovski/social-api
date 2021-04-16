@@ -4,6 +4,41 @@ from flask_sqlalchemy import SQLAlchemy
 import datetime
 from datetime import datetime
 
+def leaveParty(leavePartyBody):
+    #TODO : If the party creator decides to leave the party then delete the entire party (I'll do it tmrw)
+
+    partyToLeave = CyclePartyMember.query.filter_by(
+        userId = leavePartyBody['userId'],
+        partyId = leavePartyBody['partyId']
+        ).first()
+    db.session.delete(partyToLeave)
+    
+    #check if the party is now empty, if it is delete it from the db
+    party = CyclePartyMember.query.filter_by(partyId = leavePartyBody['partyId']).first()
+    if party is None:
+        partyToDelete = CycleParty.query.filter_by(id = leavePartyBody['partyId']).first()
+        db.session.delete(partyToDelete)
+
+    db.session.commit()
+
+def createPost(postBody):
+    new_post = Post(
+        userId = postBody['userId'], 
+        text = postBody['text'], 
+        createdOn = datetime.now())
+    db.session.add(new_post)
+    db.session.commit()
+
+def postComment(commentBody):
+    new_comment = Comment(
+        postId = commentBody['postId'],
+        userId = commentBody['userId'],
+        text = commentBody['text'],
+        createdOn = datetime.now()
+    )
+    db.session.add(new_comment)
+    db.session.commit()
+
 def addRoute(routeBody):
     new_route = Route(
         lng = routeBody['lng'],
