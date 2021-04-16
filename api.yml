@@ -9,6 +9,32 @@ produces:
   - application/json
 basePath: "/api"
 paths:
+  /createRoute/:
+    post:
+      tags : [ CreateRoute ]
+      operationId : app.addRoute
+      summary : Adding a new route
+      parameters : 
+        - $ref : '#/parameters/routeBody'
+      responses : 
+        200 :
+          description : OK
+        500 : 
+          description : Internal server error
+
+  /createCycleParty/:
+    post:
+      tags : [ CreateCycleParty ]
+      operationId : app.createCycleParty
+      summary : Creating a cycle party
+      parameters :
+        - $ref : '#/parameters/cyclePartyBody'
+      responses : 
+        200 :
+          description : OK
+        500 : 
+          description : Internal server error
+
   /ackFriendRequest/:
     post:
       tags : [ AcknowledgeFriendRequest ]
@@ -86,4 +112,41 @@ parameters:
     in : body
     schema : 
       required :
-        
+        - requestRecepient
+        - requestSender
+        - resp
+      properties :
+        requestRecepient :
+          type : integer
+        requestSender :
+          type : integer
+        resp :
+          type : boolean
+
+  cyclePartyBody : 
+    name : cyclePartyBody
+    description : This is used to create a cycling party
+    in : body
+    schema : 
+      required : 
+        - routeId
+        - partyCreatorId
+      properties :
+        routeId :
+          type : string
+        partyCreatorId : 
+          type : integer
+
+  routeBody : 
+    name : routeBody
+    description : This is used to create a route
+    in : body
+    schema : 
+      required : 
+        - lng 
+        - lat
+      properties : 
+        lng : 
+          type : string
+        lat : 
+          type : string
