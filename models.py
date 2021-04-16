@@ -65,7 +65,6 @@ class CycleParty(db.Model):
     id = db.Column(db.BigInteger, nullable = False ,default=generatedId.int, primary_key = True)
     route = db.Column(db.BigInteger, db.ForeignKey('route.id'), nullable = False)
     partyCreatorId = db.Column(db.BigInteger, nullable = False)
-    members = db.relationship("CyclePartyMember", backref = 'post')
 
 class CyclePartyMember(db.Model):
     __tablename__ = 'cycle_party_member'
