@@ -9,65 +9,81 @@ produces:
   - application/json
 basePath: "/api"
 paths:
-#  /test1/{test1_id}:
-#    get:
-#      tags: [ Test1 ]
-#      operationId: app.get_test1
-#      summary: Testing endpoint
-#      parameters:
-#        - $ref: '#/parameters/test1_id'
-#      responses:
-#        200:
-#          description: Return test1
-#        404:
-#          description: Does not exist
-#  /person/:
-#    post:
-#      tags: [ Person ]
-#      operationId: app.person_add
-#      parameters:
-#        - $ref: '#/parameters/person_body'
-#      responses:
-#        200:
-#          description: Return status
-#        409:
-#          description: Already exists
-#  /person/{person_name}:
-#    get:
-#      tags: [ Person ]
-#      operationId: app.person_find
-#      parameters:
-#        - $ref: '#/parameters/person_name'
-#      responses:
-#        200:
-#          description: Return person object
-#        404:
-#          description: Person not found
+  /ackFriendRequest/:
+    post:
+      tags : [ AcknowledgeFriendRequest ]
+      operationId : app.ackFriendRequest
+      summary : User acknowledging a friend request
+      parameters : 
+        - $ref : '#/parameters/friendBody'
+      responses : 
+        200 :
+          description : OK
+        500 : 
+          description : Internal server error
+
+  /sendFriendRequest/:
+    post:
+      tags : [ FriendRequest ]
+      operationId : app.sendFriendRequest
+      summary : Sending a friend request
+      parameters : 
+        - $ref : '#/parameters/friendRequestBody'
+      responses : 
+        200:
+          description : OK
+        500:
+          description : Internal server error
+
+  /sendMsg/:
+    post:
+      tags : [ Message ]
+      operationId : app.sendMessage
+      summary : Sending a message
+      parameters:
+        - $ref : '#/parameters/msgBody'
+      responses : 
+        200:
+          description : Message successfully sent and saved
+        500:
+          description : Internal server error
+  
 parameters:
-#  test1_id:
-#    name: test1_id
-#    description: Test1 unique id
-#    in: path
-#    type: string
-#    required: true
-#    pattern: "^[a-zA-Z0-9-]+$"
+  msgBody :
+    name : msgBody
+    description : The body of the message
+    in : body
+    schema :
+      required :
+        - fromUserId
+        - toUserId
+        - text
+      properties : 
+        fromUserId :
+          type : integer
+        toUserId :
+          type : integer
+        text : 
+          type : string
 
-  person_body:
-    name: person_body
-    description: Test1 unique id
-    in: body
+  friendRequestBody:
+    name : friendRequestBody
+    description : The body for a friend request
+    in : body
     schema:
-      required:
-        - name
+      required :
+        - fromUserId
+        - toUserId
       properties:
-        name:
-          type: string
-        surname:
-          type: string
+        fromUserId :
+          type : integer
+        toUserId :
+          type : integer
 
-  person_name:
-    name: person_name
-    description: The name of the person we're looking for
-    in: path
-    required: true
-    type: string
+  friendBody:
+    name : friendBody
+    description : This is used when a user accepts/rejects a friend request
+    in : body
+    schema : 
+      required :
+        
