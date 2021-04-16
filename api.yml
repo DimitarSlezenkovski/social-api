@@ -9,7 +9,6 @@ produces:
   - application/json
 basePath: "/api"
 paths:
-  
   /leaveParty/:
     post:
       tags : [ LeaveParty ]

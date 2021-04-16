@@ -6,7 +6,6 @@ from datetime import datetime
 
 def leaveParty(leavePartyBody):
     #TODO : If the party creator decides to leave the party then delete the entire party (I'll do it tmrw)
-
     partyToLeave = CyclePartyMember.query.filter_by(
         userId = leavePartyBody['userId'],
         partyId = leavePartyBody['partyId']
