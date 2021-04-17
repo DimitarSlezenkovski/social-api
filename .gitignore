@@ -5,3 +5,9 @@ bin
 include
 lib
 pyvenv.cfg
+.vscode
+migrations/versions/fe983dcb0055_.py
+migrations/versions/ef2123f8e42c_.py
+migrations/versions/d8ce1648831e_.py
+migrations/versions/abe3a7871807_.py
+migrations/versions/921ba6996a1a_.py
