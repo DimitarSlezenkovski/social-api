@@ -54,6 +54,8 @@ class Route(db.Model):
     id = db.Column(db.String, nullable = False ,default=generatedId, primary_key = True)
     lngFrom = db.Column(db.String, nullable = False)
     latFrom = db.Column(db.String, nullable = False)
+    lngTo = db.Column(db.String, nullable = False)
+    latTo = db.Column(db.String, nullable = False)
 
 class Location(db.Model):
     __tablename__ = 'location'
