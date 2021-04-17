@@ -46,8 +46,11 @@ class Route(db.Model):
     __tablename__ = 'route'
     generatedId = str(uuid.uuid4().hex)
     id = db.Column(db.String, nullable = False ,default=generatedId, primary_key = True)
-    lng = db.Column(db.String, nullable = False)
-    lat = db.Column(db.String, nullable = False)
+    lngFrom = db.Column(db.String, nullable = False)
+    latFrom = db.Column(db.String, nullable = False)
+    
+    lngTo = db.Column(db.String, nullable = False)
+    latTo = db.Column(db.String, nullable = False)
 
 class CycledRoute(db.Model):
     __tablename__ = 'cycled_routes'
