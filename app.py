@@ -8,7 +8,10 @@ import math
 def deleteCyclingParty(delPartyBody):
     creatorId = CycleParty.query.filter_by(id = delPartyBody['partyId']).first().partyCreatorId
     if delPartyBody['userId'] == creatorId :
-
+        partyToDelete = CycleParty.query.filter_by(id = delPartyBody['partyId']).first()
+        CyclePartyMember.query.filter_by(partyId=delPartyBody['partyId']).delete()
+        db.session.delete(partyToDelete)
+        db.session.commit()
 
 def addCycledRoute(cycledRouteBody):
     # calculating the distance traveled

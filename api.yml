@@ -9,6 +9,20 @@ produces:
   - application/json
 basePath: "/api"
 paths:
+
+  /deleteCyclingParty/:
+    post:
+      tags : [ DeleteCyclingParty ]
+      operationId : app.deleteCyclingParty
+      summary : Deleting a cycling party
+      parameters : 
+        - $ref : '#/parameters/delPartyBody'
+      responses : 
+        200 : 
+          description : OK
+        500 : 
+          description : Internal server error
+
   /addCycledRoute/:
     post:
       tags : [ AddCycledRoute ]
@@ -272,4 +286,18 @@ parameters:
         userWeight : 
           type : string
         cycledTime : 
+          type : string
+
+  delPartyBody : 
+    name : delPartyBody
+    description : This is used to delete a cycling party 
+    in : body
+    schema : 
+      required : 
+        - userId
+        - partyId
+      properties : 
+        userId : 
+          type : integer
+        partyId : 
           type : string
