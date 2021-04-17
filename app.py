@@ -5,6 +5,11 @@ import datetime
 from datetime import datetime
 import math
 
+def deleteCyclingParty(delPartyBody):
+    creatorId = CycleParty.query.filter_by(id = delPartyBody['partyId']).first().partyCreatorId
+    if delPartyBody['userId'] == creatorId :
+
+
 def addCycledRoute(cycledRouteBody):
     # calculating the distance traveled
     # approximation of the radius of the earth in km
@@ -28,13 +33,13 @@ def addCycledRoute(cycledRouteBody):
     # where the MET values are provided by "The Compendium of Physical Activities 2011" 
     MET = 1
     
-    if distance <= 5.5:
+    if distance <= 8.8:
         MET = 4
-    elif distance >= 6 and distance <= 10 : 
+    elif distance >= 9 and distance <= 16 : 
         MET = 6.3
-    elif distance >= 11 and distance < 15 :
+    elif distance >= 17 and distance < 24 :
         MET = 7.4
-    elif distance >= 15 and distance < 20 :
+    elif distance >= 24 and distance < 30 :
         MET = 10
     else : 
         MET = 20
