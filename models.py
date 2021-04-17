@@ -3,106 +3,81 @@ from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import DateTime
 from friendshipStatus import Status
+import uuid
 
+class Friends(db.Model):
+    __tablename__ = 'friends'
+    user1Id = db.Column(db.BigInteger, nullable = False, primary_key = True)
+    user2Id = db.Column(db.BigInteger, nullable = False, primary_key = True)
 
-class BaseEntity:
-    id = db.Column(db.Integer, primary_key=True)
+class FriendRequest(db.Model):
+    __table__name = 'friend_requests'
+    fromUserId = db.Column(db.BigInteger, nullable = False, primary_key = True)
+    toUserId = db.Column(db.BigInteger, nullable = False, primary_key = True)
+    status = db.Column(db.Enum(Status), default = Status.PENDING)
 
+class Message(db.Model):
+    __tablename__ = 'messages'
+    fromUserId = db.Column(db.BigInteger, nullable = False, primary_key = True)
+    toUserId = db.Column(db.BigInteger, nullable = False, primary_key = True)
+    dateSent = db.Column(db.DateTime, nullable = False, primary_key = True)
+    text = db.Column(db.String, nullable = False)
 
-class Route(db.Model, BaseEntity):
-    __tablename__ = "routes"
-    start_from = db.Column(db.String)
-    end_to = db.Column(db.String)
-    posts = db.relationship('Post', backref='route')
-    cycle_parties = db.relationship('CycleParty', backref='route')
+class Post(db.Model):
+    __tablename__ = 'posts'
+    generatedId = str(uuid.uuid4().hex)
+    id = db.Column(db.String, nullable = False ,default=generatedId, primary_key = True)
+    userId = db.Column(db.BigInteger, nullable = False)
+    text = db.Column(db.String, nullable = False)
+    # image ?
+    comments = db.relationship("Comment", backref = 'post')
+    createdOn = db.Column(db.DateTime, nullable = False)
 
-
-# User shouldn't go in db?
-
-
-class User(db.Model, BaseEntity):
-    __tablename__ = "users"
-    name = db.Column(db.String(35))
-    username = db.Column(db.String(35))
-    email = db.Column(db.String(35))
-    password = db.Column(db.String(35))
-    friends = db.relationship('Friend', backref='user')
-    friend_requests = db.relationship('FriendRequest', backref='user')
-    cycled_routes = db.relationship('CycledRoute', backref='user')
-    posts = db.relationship('Post', backref='user')
-    messages = db.relationship('Message', backref='user')
-    party_member = db.relationship('CyclePartyMember', backref='user', useList=False)
-
-
-class Friend(db.Model, BaseEntity):
-    __tablename__ = "friends"
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    became_friends_on = db.Column(DateTime)
-
-
-class FriendRequest(db.Model, BaseEntity):
-    __tablename__ = "friend_requests"
-    from_userid = db.Column(db.Integer, db.ForeignKey('users.id'))
-    to_userid = db.Column(db.Integer, db.ForeignKey('users.id'))
-    friend_request_date = db.Column(DateTime, default=datetime.utcnow)
-    is_confirmed = db.Column(db.Boolean)
-    status = db.Column(db.String)
-
-
-class Message(db.Model, BaseEntity):
-    __tablename__ = "messages"
-    from_userid = db.Column(db.Integer, db.ForeignKey('users.id'))  # ??
-    to_userid = db.Column(db.Integer, db.ForeignKey('users.id'))  # ??
-    text = db.Column(db.String)
-    sent_on = db.Column(DateTime)
-    is_seen = db.Column(db.Boolean)
-    time_seen = db.Column(db.DateTime)
-
-
-class CycledRoute(db.Model, BaseEntity):
-    __tablename__ = 'cycled_routes'
-    userid = db.Column(db.Integer, db.ForeignKey('users.id'))
-    distanceTravelled = db.Column(db.String)
-    caloriesBurned = db.Column(db.Integer)
-    location_from_id = db.Column(db.Integer, Route.id)
-    location_to_id = db.Column(db.Integer, Route.id)
-    post = db.Column(db.Integer, db.ForeignKey('posts.id'))
-
-
-class Post(db.Model, BaseEntity):
-    __tablename__ = "posts"
-    userid = db.Column(db.Integer, db.ForeignKey('users.id'))
-    text = db.Column(db.String)
-    type = db.Column(db.String)
-    image = db.Column(db.String)
-    route = db.relationship('CycledRoute', backref='post', useList=False)
-    created_on = db.Column(DateTime)
-    comments = db.relationship("Comment", backref='post')
-
-
-class Comment(db.Model, BaseEntity):
+class Comment(db.Model):
     __tablename__ = 'comments'
-    postId = db.Column(db.Integer, db.ForeignKey('posts.id'))
-    userId = db.Column(db.Integer)
-    text = db.Column(db.String)
-    created_on = db.Column(DateTime)
+    generatedId = str(uuid.uuid4().hex)
+    id = db.Column(db.String, nullable = False ,default=generatedId, primary_key = True)
+    postId = db.Column(db.String, db.ForeignKey('posts.id'))
+    userId = db.Column(db.BigInteger, nullable = False)
+    text = db.Column(db.String, nullable = False)
+    createdOn = db.Column(db.DateTime, nullable = False)
 
+class Route(db.Model):
+    __tablename__ = 'route'
+    generatedId = str(uuid.uuid4().hex)
+    id = db.Column(db.String, nullable = False ,default=generatedId, primary_key = True)
+    lngFrom = db.Column(db.String, nullable = False)
+    latFrom = db.Column(db.String, nullable = False)
 
-class Location(db.Model, BaseEntity):
-    __tablename__ = "locations"
-    userId = db.Column(db.Integer)  # ??
-    longitude = db.Column(db.String)
-    latitude = db.Column(db.String)
+    lngTo = db.Column(db.String, nullable = False)
+    latTo = db.Column(db.String, nullable = False)
 
+class CycledRoute(db.Model):
+    __tablename__ = 'cycled_routes'
+    generatedId = str(uuid.uuid4().hex)
+    #using a generated id here because a single user can cycle the same route multiple times
+    id = db.Column(db.String, nullable = False ,default=generatedId, primary_key = True)
+    #the userId here is needed to see each user's cycled routes
+    userId = db.Column(db.BigInteger, nullable = False, primary_key = True)
+    distanceTraveled = db.Column(db.String, nullable = False)
 
-class CycleParty(db.Model, BaseEntity):
-    __tablename__ = "cycle_parties"
-    route = db.Column(db.Integer, db.ForeignKey('routes.id'))
-    partyCreatorId = db.Column(db.Integer)
-    cycle_party_members = db.relationship('CyclePartyMember', backref='CycleParty')
+    #these two properties are used to determine the burned calories
+    userWeight = db.Column(db.String, nullable = False)
+    #this is represented in minutes
+    cycledTime = db.Column(db.Float, nullable = False)
 
+    caloriesBurned = db.Column(db.BigInteger)
+    route = db.Column(db.String, db.ForeignKey('route.id'), nullable = False)
 
-class CyclePartyMember(db.Model, BaseEntity):
-    __tablename__ = "cycle_party_members"
-    partyId = db.Column(db.Integer, db.ForeignKey('cycle_parties.id'))
-    userId = db.Column(db.Integer, db.ForeignKey('users.id'))
+class CycleParty(db.Model):
+    __tablename__ = 'cycle_party'
+    generatedId = str(uuid.uuid4().hex)
+    id = db.Column(db.String, nullable = False ,default=generatedId, primary_key = True)
+    route = db.Column(db.String, db.ForeignKey('route.id'), nullable = False)
+    partyCreatorId = db.Column(db.BigInteger, nullable = False)
+    members = db.relationship("CyclePartyMember", backref = 'post')
+
+class CyclePartyMember(db.Model):
+    __tablename__ = 'cycle_party_member'
+    partyId = db.Column(db.String, db.ForeignKey('cycle_party.id'), nullable = False, primary_key = True)
+    userId = db.Column(db.BigInteger, nullable = False, primary_key = True)
