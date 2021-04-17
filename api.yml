@@ -9,6 +9,58 @@ produces:
   - application/json
 basePath: "/api"
 paths:
+  /friends/{user_id}:
+    get:
+      tags: [ User friends ]
+      operationId: app.get_all_user_friends
+      summary: Testing endpoint
+      parameters:
+        - $ref: '#/parameters/user_id'
+      responses:
+        200:
+          description: Return users list
+        404:
+          description: Does not exist
+
+  /timeline/{user_id}:
+    get:
+      tags: [ User timeline ]
+      operationId: app.get_user_timeline
+      summary: Testing endpoint
+      parameters:
+        - $ref: '#/parameters/user_id'
+      responses:
+        200:
+          description: Return user feed
+        404:
+          description: Does not exists
+
+  /feed/{user_id}:
+    get:
+      tags: [ User feed ]
+      operationId: app.get_global_feed
+      summary: Testing endpoint
+      parameters:
+        - $ref: '#/parameters/user_id'
+      responses:
+        200:
+          description: Return global feed
+        404:
+          description: Does not exists
+
+  /requests/{user_id}:
+    get:
+      tags: [ User friend requests ]
+      operationId: app.get_all_user_friend_requests
+      summary: Testing endpoint
+      parameters:
+        - $ref: '#/parameters/user_id'
+      responses:
+        200:
+          description: Return friend requests
+        404:
+          description: Does not exists
+
   /location:
     post:
       tags: [ SaveUserLocation ]
@@ -242,7 +294,14 @@ parameters:
           type : string
         isCycleService :
           type : boolean
-
+          
+  user_id:
+    name: user_id
+    description: User unique id
+    in: path
+    type: integer
+    required: true
+    
   userId:
     name: userId
     description: User id

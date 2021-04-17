@@ -25,13 +25,23 @@ class Message(db.Model):
 
 class Post(db.Model):
     __tablename__ = 'posts'
-    generatedId = uuid.uuid1()
-    id = db.Column(db.BigInteger, nullable=False, default=generatedId.int, primary_key=True)
+    generatedId = str(uuid.uuid4().hex)
+    id = db.Column(db.String, nullable=False, default=generatedId, primary_key=True)
     userId = db.Column(db.BigInteger, nullable=False)
     text = db.Column(db.String, nullable=False)
     image = db.Column(db.String, nullable=True)
     comments = db.relationship("Comment", backref='post')
-    createdOn = db.Column(db.Date)
+    createdOn = db.Column(db.DateTime, nullable=False)
+
+
+class Comment(db.Model):
+    __tablename__ = 'comments'
+    generatedId = str(uuid.uuid4().hex)
+    id = db.Column(db.String, nullable=False, default=generatedId, primary_key=True)
+    postId = db.Column(db.String, db.ForeignKey('posts.id'))
+    userId = db.Column(db.BigInteger, nullable=False)
+    text = db.Column(db.String, nullable=False)
+    createdOn = db.Column(db.DateTime, nullable=False)
     generatedId = str(uuid.uuid4().hex)
     id = db.Column(db.String, nullable = False ,default=generatedId, primary_key = True)
     userId = db.Column(db.BigInteger, nullable = False)
@@ -51,11 +61,11 @@ class Comment(db.Model):
 class Route(db.Model):
     __tablename__ = 'route'
     generatedId = str(uuid.uuid4().hex)
-    id = db.Column(db.String, nullable = False ,default=generatedId, primary_key = True)
-    lngFrom = db.Column(db.String, nullable = False)
-    latFrom = db.Column(db.String, nullable = False)
-    lngTo = db.Column(db.String, nullable = False)
-    latTo = db.Column(db.String, nullable = False)
+    id = db.Column(db.String, nullable=False, default=generatedId, primary_key=True)
+    lngFrom = db.Column(db.String, nullable=False)
+    latFrom = db.Column(db.String, nullable=False)
+    lngTo = db.Column(db.String, nullable=False)
+    latTo = db.Column(db.String, nullable=False)
 
 class Location(db.Model):
     __tablename__ = 'location'
@@ -65,29 +75,35 @@ class Location(db.Model):
     lat = db.Column(db.String, nullable=False)
     userId = db.Column(db.BigInteger, nullable=False)
     isCycleService = db.Column(db.Boolean, nullable=True)
-    lngTo = db.Column(db.String, nullable = False)
-    latTo = db.Column(db.String, nullable = False)
 
 class CycledRoute(db.Model):
     __tablename__ = 'cycled_routes'
     generatedId = str(uuid.uuid4().hex)
-    #using a generated id here because a single user can cycle the same route multiple times
-    id = db.Column(db.String, nullable = False ,default=generatedId, primary_key = True)
-    #the userId here is needed to see each user's cycled routes
-    userId = db.Column(db.BigInteger, nullable = False, primary_key = True)
-    distanceTraveled = db.Column(db.String, nullable = False)
-
-    #these two properties are used to determine the burned calories
-    userWeight = db.Column(db.String, nullable = False)
-    #this is represented in minutes
-    cycledTime = db.Column(db.Float, nullable = False)
-
+    # using a generated id here because a single user can cycle the same route multiple times
+    id = db.Column(db.String, nullable=False, default=generatedId, primary_key=True)
+    # the userId here is needed to see each user's cycled routes
+    userId = db.Column(db.BigInteger, nullable=False, primary_key=True)
+    distanceTraveled = db.Column(db.String, nullable=False)
+    # these two properties are used to determine the burned calories
+    userWeight = db.Column(db.String, nullable=False)
+    # this is represented in minutes
+    cycledTime = db.Column(db.Float, nullable=False)
     caloriesBurned = db.Column(db.BigInteger)
-    route = db.Column(db.String, db.ForeignKey('route.id'), nullable = False)
+    route = db.Column(db.String, db.ForeignKey('route.id'), nullable=False)
 
 class CycleParty(db.Model):
     __tablename__ = 'cycle_party'
     generatedId = str(uuid.uuid4().hex)
+    id = db.Column(db.String, nullable=False, default=generatedId, primary_key=True)
+    route = db.Column(db.String, db.ForeignKey('route.id'), nullable=False)
+    partyCreatorId = db.Column(db.BigInteger, nullable=False)
+    members = db.relationship("CyclePartyMember", backref='post')
+
+
+class CyclePartyMember(db.Model):
+    __tablename__ = 'cycle_party_member'
+    partyId = db.Column(db.String, db.ForeignKey('cycle_party.id'), nullable=False, primary_key=True)
+    userId = db.Column(db.BigInteger, nullable=False, primary_key=True)
     id = db.Column(db.String, nullable = False ,default=generatedId, primary_key = True)
     route = db.Column(db.String, db.ForeignKey('route.id'), nullable = False)
     partyCreatorId = db.Column(db.BigInteger, nullable = False)
