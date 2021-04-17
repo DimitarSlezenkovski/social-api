@@ -9,6 +9,19 @@ produces:
   - application/json
 basePath: "/api"
 paths:
+  /addCycledRoute/:
+    post:
+      tags : [ AddCycledRoute ]
+      operationId : app.addCycledRoute
+      summary : User adding a cycled route
+      parameters : 
+        - $ref : '#/parameters/cycledRouteBody'
+      responses : 
+        200 : 
+          description : OK
+        500 : 
+          description : Internal server error
+
   /leaveParty/:
     post:
       tags : [ LeaveParty ]
@@ -182,12 +195,18 @@ parameters:
     in : body
     schema : 
       required : 
-        - lng 
-        - lat
+        - lngFrom 
+        - latFrom
+        - lngTo
+        - latTo
       properties : 
-        lng : 
+        lngFrom : 
           type : string
-        lat : 
+        latFrom : 
+          type : string
+        lngTo : 
+          type : string
+        latTo : 
           type : string
 
   postBody:
@@ -234,3 +253,23 @@ parameters:
           type : string
         userId : 
           type : integer
+
+  cycledRouteBody :
+    name : cycledRouteBody
+    description : This is used when a user adds a cycled route
+    in : body
+    schema : 
+      required :
+        - userId
+        - route
+        - userWeight
+        - cycledTime
+      properties : 
+        userId : 
+          type : integer
+        route : 
+          type : string
+        userWeight : 
+          type : string
+        cycledTime : 
+          type : string
