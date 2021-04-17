@@ -3,6 +3,55 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 import datetime
 from datetime import datetime
+import math
+
+def addCycledRoute(cycledRouteBody):
+    # calculating the distance traveled
+    # approximation of the radius of the earth in km
+    R = 6373.0
+
+    latFrom = math.radians(float(Route.query.filter_by(id = cycledRouteBody['route']).first().latFrom))
+    lngFrom = math.radians(float(Route.query.filter_by(id = cycledRouteBody['route']).first().lngFrom))
+    latTo = math.radians(float(Route.query.filter_by(id = cycledRouteBody['route']).first().latTo))
+    lngTo = math.radians(float(Route.query.filter_by(id = cycledRouteBody['route']).first().lngTo))
+    
+    deltaLng = lngTo - lngFrom
+    deltaLat = latFrom - latTo
+
+    # using the haversine formula to determine the distance which the user traveled
+    a = (math.sin(deltaLat/2))**2 + math.cos(latFrom) * math.cos(latTo) * (math.sin(deltaLng/2))**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+
+    distance = R * c
+
+    # burned calories = ((MET * userWeight * 3.5) / 200) * cycledTime 
+    # where the MET values are provided by "The Compendium of Physical Activities 2011" 
+    MET = 1
+    
+    if distance <= 5.5:
+        MET = 4
+    elif distance >= 6 and distance <= 10 : 
+        MET = 6.3
+    elif distance >= 11 and distance < 15 :
+        MET = 7.4
+    elif distance >= 15 and distance < 20 :
+        MET = 10
+    else : 
+        MET = 20
+
+    burnedCalories = ((MET * float(cycledRouteBody['userWeight']) * 3.5) / 200) * float(cycledRouteBody['cycledTime'])
+
+    new_cycledRoute = CycledRoute(
+        userId = cycledRouteBody['userId'],
+        distanceTraveled = str(distance),
+        userWeight = cycledRouteBody['userWeight'],
+        cycledTime = float(cycledRouteBody['cycledTime']),
+        caloriesBurned = burnedCalories,
+        route = cycledRouteBody['route']
+    )
+
+    db.session.add(new_cycledRoute)
+    db.session.commit()
 
 def leaveParty(leavePartyBody):
     #TODO : If the party creator decides to leave the party then delete the entire party (I'll do it tmrw)
@@ -40,8 +89,11 @@ def postComment(commentBody):
 
 def addRoute(routeBody):
     new_route = Route(
-        lng = routeBody['lng'],
-        lat = routeBody['lat'])
+        lngFrom = routeBody['lngFrom'],
+        latFrom = routeBody['latFrom'],
+        lngTo = routeBody['lngTo'],
+        latTo = routeBody['latTo']
+        )
     db.session.add(new_route)
     db.session.commit()
 
