@@ -9,65 +9,63 @@ produces:
   - application/json
 basePath: "/api"
 paths:
-  /test1/{test1_id}:
+  /friends/{user_id}:
     get:
-      tags: [ Test1 ]
-      operationId: app.get_test1
+      tags: [ User friends ]
+      operationId: app.get_all_user_friends
       summary: Testing endpoint
       parameters:
-        - $ref: '#/parameters/test1_id'
+        - $ref: '#/parameters/user_id'
       responses:
         200:
-          description: Return test1
+          description: Return users list
         404:
           description: Does not exist
-#  /person/:
-#    post:
-#      tags: [ Person ]
-#      operationId: app.person_add
-#      parameters:
-#        - $ref: '#/parameters/person_body'
-#      responses:
-#        200:
-#          description: Return status
-#        409:
-#          description: Already exists
-#  /person/{person_name}:
-#    get:
-#      tags: [ Person ]
-#      operationId: app.person_find
-#      parameters:
-#        - $ref: '#/parameters/person_name'
-#      responses:
-#        200:
-#          description: Return person object
-#        404:
-#          description: Person not found
-parameters:
-  test1_id:
-    name: test1_id
-    description: Test1 unique id
-    in: path
-    type: string
-    required: true
-    pattern: "^[a-zA-Z0-9-]+$"
 
-#  person_body:
-#    name: person_body
-#    description: Test1 unique id
-#    in: body
-#    schema:
-#      required:
-#        - name
-#      properties:
-#        name:
-#          type: string
-#        surname:
-#          type: string
-#
-#  person_name:
-#    name: person_name
-#    description: The name of the person we're looking for
-#    in: path
-#    required: true
-#    type: string
+  /timeline/{user_id}:
+    get:
+      tags: [ User timeline ]
+      operationId: app.get_user_timeline
+      summary: Testing endpoint
+      parameters:
+        - $ref: '#/parameters/user_id'
+      responses:
+        200:
+          description: Return user feed
+        404:
+          description: Does not exists
+
+  /feed/{user_id}:
+    get:
+      tags: [ User feed ]
+      operationId: app.get_global_feed
+      summary: Testing endpoint
+      parameters:
+        - $ref: '#/parameters/user_id'
+      responses:
+        200:
+          description: Return global feed
+        404:
+          description: Does not exists
+
+  /requests/{user_id}:
+    get:
+      tags: [ User friend requests ]
+      operationId: app.get_all_user_friend_requests
+      summary: Testing endpoint
+      parameters:
+        - $ref: '#/parameters/user_id'
+      responses:
+        200:
+          description: Return friend requests
+        404:
+          description: Does not exists
+
+
+parameters:
+  user_id:
+    name: user_id
+    description: User unique id
+    in: path
+    type: integer
+    required: true
