@@ -33,7 +33,7 @@ class Post(db.Model):
     id = db.Column(db.BigInteger, nullable=False, default=generatedId.int, primary_key=True)
     userId = db.Column(db.BigInteger, nullable=False)
     text = db.Column(db.String, nullable=False)
-    # image ?
+    image = db.Column(db.String, nullable=True)
     comments = db.relationship("Comment", backref='post')
     createdOn = db.Column(db.Date)
 
@@ -55,6 +55,14 @@ class Route(db.Model):
     lng = db.Column(db.String, nullable=False)
     lat = db.Column(db.String, nullable=False)
 
+class Location(db.Model):
+    __tablename__ = 'location'
+    generatedId = uuid.uuid1()
+    id = db.Column(db.BigInteger, nullable=False, default=generatedId.int, primary_key=True)
+    lng = db.Column(db.String, nullable=False)
+    lat = db.Column(db.String, nullable=False)
+    userId = db.Column(db.BigInteger, nullable=False)
+    isCycleService = db.Column(db.Boolean, nullable=True)
 
 class CycledRoute(db.Model):
     __tablename__ = 'cycled_routes'

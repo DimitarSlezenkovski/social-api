@@ -9,65 +9,124 @@ produces:
   - application/json
 basePath: "/api"
 paths:
-  /test1/{test1_id}:
-    get:
-      tags: [ Test1 ]
-      operationId: app.get_test1
-      summary: Testing endpoint
+
+  /location:
+    post:
+      tags: [ SaveUserLocation ]
+      operationId: app.saveUserLocation
+      summary: Saving user location
       parameters:
-        - $ref: '#/parameters/test1_id'
+        - $ref: '#/parameters/locationBody'
       responses:
         200:
-          description: Return test1
+          description: OK
         404:
-          description: Does not exist
-#  /person/:
-#    post:
-#      tags: [ Person ]
-#      operationId: app.person_add
-#      parameters:
-#        - $ref: '#/parameters/person_body'
-#      responses:
-#        200:
-#          description: Return status
-#        409:
-#          description: Already exists
-#  /person/{person_name}:
-#    get:
-#      tags: [ Person ]
-#      operationId: app.person_find
-#      parameters:
-#        - $ref: '#/parameters/person_name'
-#      responses:
-#        200:
-#          description: Return person object
-#        404:
-#          description: Person not found
+          description: Internal server error
+
+  /ecyclists:
+    get:
+      tags: [ GetAllUsersLocation ]
+      operationId: app.getAllUsersLocation
+      summary: Getting all users locations
+      responses:
+        200:
+          description: OK
+
+  /ecycleservices:
+    get:
+      tags: [ GetEcycleServices ]
+      operationId: app.getEcycleServices
+      summary: Getting ecycle services
+      responses:
+        200:
+          description: OK
+
+  /cyclehistory/{userId}:
+    get:
+      tags: [ GetCycleHistory ]
+      operationId: app.getCycleHistory
+      summary: Get cycle history
+      parameters:
+        - $ref: '#/parameters/userId'
+      responses:
+        200:
+          description: OK
+        404:
+          description: Internal server error
+
+  /posts/edit:
+    put:
+      tags: [ EditPost ]
+      operationId: app.editPost
+      summary: Editing post
+      parameters:
+        - $ref: '#/parameters/postBody'
+      responses:
+        200:
+          description: OK
+        404:
+          description: Internal server error
+
+  /posts/delete/{postId}:
+    delete:
+      tags: [ DeletePost ]
+      operationId: app.deletePost
+      summary: Deleting post
+      parameters:
+        - $ref: '#/parameters/postId'
+      responses:
+        200:
+          description: OK
+        404:
+          description: Internal server error
+
 parameters:
-  test1_id:
-    name: test1_id
-    description: Test1 unique id
+  locationBody:
+    name: locationBody
+    description: locationBody
+    in: body
+    schema : 
+      required : 
+        - userId
+        - lat
+        - lng
+        - isCycleService
+      properties :
+        userId : 
+          type : integer
+        lat : 
+          type : string
+        lng :
+          type : string
+        isCycleService :
+          type : boolean
+
+  userId:
+    name: userId
+    description: User id
+    in: path
+    type: integer
+    required: true
+
+  postBody:
+    name : postBody
+    description : This will create a new post (not the http method haha)
+    in : body
+    schema : 
+      required : 
+        - userId
+        - text
+      properties :
+        userId : 
+          type : integer
+        text : 
+          type : string
+        image :
+          type : string
+
+  postId:
+    name: postId
+    description: Post id
     in: path
     type: string
     required: true
-    pattern: "^[a-zA-Z0-9-]+$"
-
-#  person_body:
-#    name: person_body
-#    description: Test1 unique id
-#    in: body
-#    schema:
-#      required:
-#        - name
-#      properties:
-#        name:
-#          type: string
-#        surname:
-#          type: string
-#
-#  person_name:
-#    name: person_name
-#    description: The name of the person we're looking for
-#    in: path
-#    required: true
-#    type: string
