@@ -25,14 +25,20 @@ class Message(db.Model):
 
 class Post(db.Model):
     __tablename__ = 'posts'
+    generatedId = uuid.uuid1()
+    id = db.Column(db.BigInteger, nullable=False, default=generatedId.int, primary_key=True)
+    userId = db.Column(db.BigInteger, nullable=False)
+    text = db.Column(db.String, nullable=False)
+    image = db.Column(db.String, nullable=True)
+    comments = db.relationship("Comment", backref='post')
+    createdOn = db.Column(db.Date)
     generatedId = str(uuid.uuid4().hex)
     id = db.Column(db.String, nullable = False ,default=generatedId, primary_key = True)
     userId = db.Column(db.BigInteger, nullable = False)
     text = db.Column(db.String, nullable = False)
-    # image ?
     comments = db.relationship("Comment", backref = 'post')
     createdOn = db.Column(db.DateTime, nullable = False)
-
+    
 class Comment(db.Model):
     __tablename__ = 'comments'
     generatedId = str(uuid.uuid4().hex)
@@ -49,6 +55,14 @@ class Route(db.Model):
     lngFrom = db.Column(db.String, nullable = False)
     latFrom = db.Column(db.String, nullable = False)
 
+class Location(db.Model):
+    __tablename__ = 'location'
+    generatedId = uuid.uuid1()
+    id = db.Column(db.BigInteger, nullable=False, default=generatedId.int, primary_key=True)
+    lng = db.Column(db.String, nullable=False)
+    lat = db.Column(db.String, nullable=False)
+    userId = db.Column(db.BigInteger, nullable=False)
+    isCycleService = db.Column(db.Boolean, nullable=True)
     lngTo = db.Column(db.String, nullable = False)
     latTo = db.Column(db.String, nullable = False)
 

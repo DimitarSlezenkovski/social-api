@@ -4,6 +4,7 @@ __pycache__
 bin
 include
 lib
+pyvenv.cfg
 .vscode
 migrations/versions/fe983dcb0055_.py
 migrations/versions/ef2123f8e42c_.py

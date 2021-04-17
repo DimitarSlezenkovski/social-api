@@ -2,13 +2,82 @@ swagger: '2.0'
 info:
   title: Social API
   version: "0.1"
-  description: Social network API
+  description: Social microservice API
 consumes:
   - application/json
 produces:
   - application/json
 basePath: "/api"
 paths:
+  /location:
+    post:
+      tags: [ SaveUserLocation ]
+      operationId: app.saveUserLocation
+      summary: Saving user location
+      parameters:
+        - $ref: '#/parameters/locationBody'
+      responses:
+        200:
+          description: OK
+        404:
+          description: Internal server error
+
+  /ecyclists:
+    get:
+      tags: [ GetAllUsersLocation ]
+      operationId: app.getAllUsersLocation
+      summary: Getting all users locations
+      responses:
+        200:
+          description: OK
+
+  /ecycleservices:
+    get:
+      tags: [ GetEcycleServices ]
+      operationId: app.getEcycleServices
+      summary: Getting ecycle services
+      responses:
+        200:
+          description: OK
+
+  /cyclehistory/{userId}:
+    get:
+      tags: [ GetCycleHistory ]
+      operationId: app.getCycleHistory
+      summary: Get cycle history
+      parameters:
+        - $ref: '#/parameters/userId'
+      responses:
+        200:
+          description: OK
+        404:
+          description: Internal server error
+
+  /posts/edit:
+    put:
+      tags: [ EditPost ]
+      operationId: app.editPost
+      summary: Editing post
+      parameters:
+        - $ref: '#/parameters/postBody'
+      responses:
+        200:
+          description: OK
+        404:
+          description: Internal server error
+
+  /posts/delete/{postId}:
+    delete:
+      tags: [ DeletePost ]
+      operationId: app.deletePost
+      summary: Deleting post
+      parameters:
+        - $ref: '#/parameters/postId'
+      responses:
+        200:
+          description: OK
+        404:
+          description: Internal server error
 
   /deleteComment/:
     post : 
@@ -152,8 +221,35 @@ paths:
           description : Message successfully sent and saved
         500:
           description : Internal server error
-  
+
 parameters:
+  locationBody:
+    name: locationBody
+    description: locationBody
+    in: body
+    schema : 
+      required : 
+        - userId
+        - lat
+        - lng
+        - isCycleService
+      properties :
+        userId : 
+          type : integer
+        lat : 
+          type : string
+        lng :
+          type : string
+        isCycleService :
+          type : boolean
+
+  userId:
+    name: userId
+    description: User id
+    in: path
+    type: integer
+    required: true
+    
   msgBody :
     name : msgBody
     description : The body of the message
@@ -249,6 +345,15 @@ parameters:
           type : integer
         text : 
           type : string
+        image :
+          type : string
+
+  postId:
+    name: postId
+    description: Post id
+    in: path
+    type: string
+    required: true
 
   commentBody : 
     name : commentBody
