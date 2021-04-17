@@ -42,7 +42,7 @@ def get_global_feed(user_id):
         for post in posts:
             user_posts.append({'userId': post.userId, 'text': post.text, 'comments': post.comments})
 
-    return {'posts': user_posts}
+    return {'posts': user_posts }
 
 
 def get_all_user_friend_requests(user_id):
