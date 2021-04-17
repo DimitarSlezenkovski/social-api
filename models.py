@@ -48,17 +48,24 @@ class Route(db.Model):
     id = db.Column(db.String, nullable = False ,default=generatedId, primary_key = True)
     lngFrom = db.Column(db.String, nullable = False)
     latFrom = db.Column(db.String, nullable = False)
-    
+
     lngTo = db.Column(db.String, nullable = False)
     latTo = db.Column(db.String, nullable = False)
 
 class CycledRoute(db.Model):
     __tablename__ = 'cycled_routes'
     generatedId = str(uuid.uuid4().hex)
+    #using a generated id here because a single user can cycle the same route multiple times
     id = db.Column(db.String, nullable = False ,default=generatedId, primary_key = True)
     #the userId here is needed to see each user's cycled routes
     userId = db.Column(db.BigInteger, nullable = False, primary_key = True)
     distanceTraveled = db.Column(db.String, nullable = False)
+
+    #these two properties are used to determine the burned calories
+    userWeight = db.Column(db.String, nullable = False)
+    #this is represented in minutes
+    cycledTime = db.Column(db.Float, nullable = False)
+
     caloriesBurned = db.Column(db.BigInteger)
     route = db.Column(db.String, db.ForeignKey('route.id'), nullable = False)
 
