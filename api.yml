@@ -10,6 +10,19 @@ produces:
 basePath: "/api"
 paths:
 
+  /deleteComment/:
+    post : 
+      tags : [ DeleteComment ]
+      operationId : app.deleteComment
+      summary : Deleting a comment
+      parameters : 
+        - $ref : '#/parameters/delCommentBody'
+      responses : 
+        200 : 
+          description : OK
+        500 : 
+          description : Internal server error
+
   /deleteCyclingParty/:
     post:
       tags : [ DeleteCyclingParty ]
@@ -300,4 +313,21 @@ parameters:
         userId : 
           type : integer
         partyId : 
+          type : string
+
+  delCommentBody : 
+    name : delCommentBody
+    description : This is used to delete a comment
+    in : body
+    schema : 
+      required : 
+        - userId
+        - postId
+        - commentId
+      properties : 
+        userId : 
+          type : integer
+        commentId : 
+          type : string
+        postId : 
           type : string

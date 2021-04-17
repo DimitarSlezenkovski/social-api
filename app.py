@@ -5,6 +5,9 @@ import datetime
 from datetime import datetime
 import math
 
+def deleteComment(delCommentBody):
+    return
+
 def deleteCyclingParty(delPartyBody):
     creatorId = CycleParty.query.filter_by(id = delPartyBody['partyId']).first().partyCreatorId
     if delPartyBody['userId'] == creatorId :
@@ -144,9 +147,11 @@ def ackFriendRequest(friendBody):
         if friendBody['resp'] == True:
             new_friends = Friends(user1Id = friendBody['requestSender'], user2Id = friendBody['requestRecepient'])
             db.session.add(new_friends)
-            # TODO : DELETE FRIEND REQUEST FROM DB WHEN A FRIEND HAS BEEN ACCEPTED/REJECTED
+            FriendRequest.query.filter_by(fromUserId = friendBody['requestSender']).delete()
             db.session.commit()
-        #TODO : ADD AN ELSE PART WHERE YOU JUST REMOVE THE FRIEND REQUEST FROM THE DB
+        else :
+            FriendRequest.query.filter_by(fromUserId = friendBody['requestSender']).delete()
+            db.session.commit()
 
 connexion_app = connexion.App(__name__, specification_dir="./")
 app = connexion_app.app
