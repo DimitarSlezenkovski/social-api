@@ -123,18 +123,6 @@ def deletePost(postId):
         return True
 
 
-def deleteComment(delCommentBody):
-    comment_id = delCommentBody['commentId']
-    comment = db.session.query(Comment).filter(id=comment_id).one()
-    db.session.query(Comment).delete(comment)
-    db.session.commit()
-    is_comment_present = db.session.query(Comment).filter(id=comment_id).one()
-    if is_comment_present:
-        return False
-    else:
-        return True
-
-
 def deleteCyclingParty(delPartyBody):
     creatorId = CycleParty.query.filter_by(id=delPartyBody['partyId']).first().partyCreatorId
     if delPartyBody['userId'] == creatorId:
@@ -338,7 +326,7 @@ def deleteComment(commentId):
 
 connexion_app = connexion.App(__name__, specification_dir="./")
 app = connexion_app.app
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:1234@localhost:5432/socialdb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/social-db'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 connexion_app.add_api("api.yml")

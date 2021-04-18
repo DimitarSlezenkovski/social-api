@@ -183,21 +183,6 @@ paths:
         404:
           description: Internal server error
 
-  /deleteComment/:
-    post : 
-      tags : [ Delete comment ]
-      operationId : app.deleteComment
-      summary : Deleting a comment
-      parameters : 
-        - $ref : '#/parameters/delCommentBody'
-      responses : 
-        200 : 
-          description : OK
-        400:
-          description: Bad request
-        500 : 
-          description : Internal server error
-
   /deleteCyclingParty/:
     post:
       tags : [ DeleteCyclingParty ]
