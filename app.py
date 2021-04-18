@@ -36,8 +36,13 @@ def get_user_timeline(user_id):
     # user_feed = Post.query.filter_by(userId=user_id).all()
     user_feed = db.session.query(Post).filter_by(userId=user_id).all()
     user_post_feed = []
+    post_comments = []
     for post in user_feed:
-        user_post_feed.append({'userId': post.userId, 'text': post.text, 'comments': post.comments})
+        for comments in post.comments:
+            post_comments.append({'text' : comments.text})
+            print(comments.text)
+        user_post_feed.append({'userId': post.userId, 'text': post.text, 'comments': post_comments})
+        post_comments = []
     return {'timeline': user_post_feed}
 
 
