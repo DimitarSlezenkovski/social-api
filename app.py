@@ -290,9 +290,55 @@ def ackFriendRequest(friendBody):
             db.session.commit()
 
 
+def getUserConversation(msgBody):
+    messages = db.session.query(Message).filter_by(fromUserId=msgBody['fromUserId'],
+                                                   toUserId=msgBody['toUserId'])
+    json_messages = []
+    for m in messages:
+        json_messages.append({'fromUserId': m.fromUserId, 'toUserId': m.toUserId, 'text': m.text})
+    return {'messages': json_messages}
+
+
+def editCyclingParty(cyclePartyBody):
+    cycleParty = db.session.query(CycleParty).get(cyclePartyBody['id'])
+    if cycleParty:
+        partyRoute = db.session.query(Route).get(cyclePartyBody['routeId'])
+        if partyRoute:
+            partyRoute.lngFrom = cycleParty["lngFrom"]
+            partyRoute.latFrom = cycleParty["latFrom"]
+            partyRoute.lngTo = cycleParty["lngTo"]
+            partyRoute.latTo = cycleParty["latTo"]
+            db.session.commit()
+        return True
+    else:
+        return {'error': 'Cycle Party not found'}, 404
+
+
+def editComment(commentBody):
+    comment = db.session.query(Comment).get(commentBody['id'])
+    if comment:
+        if commentBody['text']:
+            comment.text = commentBody['text']
+        db.session.commit()
+        return True
+    else:
+        return {'error': 'Comment not found'}, 404
+
+
+def deleteComment(commentId):
+    comment = db.session.query(Comment).filter_by(id=commentId).one()
+    db.session.query(Comment).delete(comment)
+    db.session.commit()
+    isCommentPresent = db.session.query(Comment).filter_by(id=commentId).one()
+    if isCommentPresent:
+        return False
+    else:
+        return True
+
+
 connexion_app = connexion.App(__name__, specification_dir="./")
 app = connexion_app.app
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/social-db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:1234@localhost:5432/social-db'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 connexion_app.add_api("api.yml")

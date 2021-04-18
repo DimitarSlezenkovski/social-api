@@ -9,6 +9,58 @@ produces:
   - application/json
 basePath: "/api"
 paths:
+  /comments/edit:
+    put:
+      tags: [ EditComment ]
+      operationId: app.editComment
+      summary: Editing comment
+      parameters:
+        - $ref: '#/parameters/commentBody'
+      responses:
+        200:
+          description: OK
+        404:
+          description: Comment not found
+
+  /cycledParties/edit:
+    put:
+      tags: [ EditCycleParty ]
+      operationId: app.editCyclingParty
+      summary: Editing Cycling party
+      parameters:
+        - $ref: '#/parameters/cyclePartyBody'
+      responses:
+        200:
+          description: OK
+        404:
+          description: Cycled Party not found
+
+  /comments/delete/{commentId}:
+    delete:
+      tags: [ DeleteComment ]
+      operationId: app.deleteComment
+      summary: Deleting comment
+      parameters:
+        - $ref: '#/parameters/commentId'
+      responses:
+        200:
+          description: OK
+        404:
+          description: Comment not found
+
+  /messages:
+    get:
+      tags: [ GetUserConversation ]
+      operationId: app.getUserConversation
+      summary: Getting all user conversations
+      parameters:
+        - $ref: '#/parameters/msgBody'
+      responses:
+        200:
+          description: OK
+        404:
+          description: User Conversation not found
+  
   /friends/{user_id}:
     get:
       tags: [ User friends ]
@@ -277,6 +329,13 @@ paths:
           description : Internal server error
 
 parameters:
+  commentId:
+    name: commentId
+    description: Comment id
+    in: path
+    type: string
+    required: true
+
   locationBody:
     name: locationBody
     description: locationBody
@@ -416,6 +475,22 @@ parameters:
     type: string
     required: true
 
+  msgBody:
+    name: msgBody
+    description: The body of the message
+    in: body
+    schema:
+      required:
+        - fromUserId
+        - toUserId
+        - text
+      properties:
+        fromUserId:
+          type: integer
+        toUserId:
+          type: integer
+        text:
+          type: string
   commentBody : 
     name : commentBody
     description : This will post a comment to an existing post
