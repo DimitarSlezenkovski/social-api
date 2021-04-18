@@ -37,6 +37,7 @@ class Post(db.Model):
     comments = db.relationship("Comment", backref='post')
     createdOn = db.Column(db.DateTime, nullable=False)
 
+
 class Comment(db.Model):
     __tablename__ = 'comments'
     generatedId = str(uuid.uuid4().hex)
@@ -90,6 +91,7 @@ class CycleParty(db.Model):
     route = db.Column(db.String, db.ForeignKey('route.id'), nullable=False)
     partyCreatorId = db.Column(db.BigInteger, nullable=False)
     members = db.relationship("CyclePartyMember", backref='post')
+
 
 class CyclePartyMember(db.Model):
     __tablename__ = 'cycle_party_member'

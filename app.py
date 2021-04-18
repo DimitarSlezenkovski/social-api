@@ -124,7 +124,15 @@ def deletePost(postId):
 
 
 def deleteComment(delCommentBody):
-    return
+    comment_id = delCommentBody['commentId']
+    comment = db.session.query(Comment).filter(id=comment_id).one()
+    db.session.query(Comment).delete(comment)
+    db.session.commit()
+    is_comment_present = db.session.query(Comment).filter(id=comment_id).one()
+    if is_comment_present:
+        return False
+    else:
+        return True
 
 
 def deleteCyclingParty(delPartyBody):
