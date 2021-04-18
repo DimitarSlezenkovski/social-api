@@ -9,123 +9,110 @@ produces:
   - application/json
 basePath: "/api"
 paths:
-/comments/edit:
+  /comments/edit:
     put:
       tags: [ EditComment ]
       operationId: app.editComment
       summary: Editing comment
       parameters:
-        - $ref: '#/parameters/postComment'
+        - $ref: '#/parameters/commentBody'
       responses:
         200:
           description: OK
         404:
-          description: Internal server error
+          description: Comment not found
 
-/cycledParties/edit:
+  /cycledParties/edit:
     put:
-      tags: [ EditCycleParty]
-      operationId: app.editCycleParty
+      tags: [ EditCycleParty ]
+      operationId: app.editCyclingParty
       summary: Editing Cycling party
       parameters:
-        - $ref: '#/parameters/postCycleParty'
+        - $ref: '#/parameters/cyclePartyBody'
       responses:
         200:
           description: OK
         404:
-          description: Internal server error
+          description: Cycled Party not found
 
-
-/comments/delete/{commentId}:
+  /comments/delete/{commentId}:
     delete:
       tags: [ DeleteComment ]
       operationId: app.deleteComment
       summary: Deleting comment
       parameters:
-        - $ref: '#/parameters/CommentId'
+        - $ref: '#/parameters/commentId'
       responses:
         200:
           description: OK
         404:
-          description: Internal server error
+          description: Comment not found
 
-parametars:
- commentBody:
-    name : commentBody
-    description : This will create a new comment
-    in : body
-    schema :
-      required :
+  /messages:
+    get:
+      tags: [ GetUserConversation ]
+      operationId: app.getUserConversation
+      summary: Getting all user conversations
+      parameters:
+        - $ref: '#/parameters/msgBody'
+      responses:
+        200:
+          description: OK
+        404:
+          description: User Conversation not found
+
+parameters:
+  commentBody:
+    name: commentBody
+    description: This will post a comment to an existing post
+    in: body
+    schema:
+      required:
         - postId
         - userId
         - text
-      properties :
+      properties:
         postId:
+          type: string
+        userId:
           type: integer
-        userId :
-          type : integer
-        text :
-          type : string
+        text:
+          type: string
 
-cyclePartyBody :
-    name : cyclePartyBody
-    description : This will create a cycling party
-    in : body
-    schema :
-      required :
+  cyclePartyBody:
+    name: cyclePartyBody
+    description: This is used to create a cycling party
+    in: body
+    schema:
+      required:
         - routeId
         - partyCreatorId
-      properties :
-        routeId :
-          type : string
-        partyCreatorId :
-          type : integer
+      properties:
+        routeId:
+          type: string
+        partyCreatorId:
+          type: integer
 
-
-commentId:
+  commentId:
     name: commentId
     description: Comment id
     in: path
     type: string
     required: true
-#  /person/:
-#    post:
-#      tags: [ Person ]
-#      operationId: app.person_add
-#      parameters:
-#        - $ref: '#/parameters/person_body'
-#      responses:
-#        200:
-#          description: Return status
-#        409:
-#          description: Already exists
-#  /person/{person_name}:
-#    get:
-#      tags: [ Person ]
-#      operationId: app.person_find
-#      parameters:
-#        - $ref: '#/parameters/person_name'
-#      responses:
-#        200:
-#          description: Return person object
-#        404:
-#          description: Person not found
-#  person_body:
-#    name: person_body
-#    description: Test1 unique id
-#    in: body
-#    schema:
-#      required:
-#        - name
-#      properties:
-#        name:
-#          type: string
-#        surname:
-#          type: string
-#
-#  person_name:
-#    name: person_name
-#    description: The name of the person we're looking for
-#    in: path
-#    required: true
-#    type: string
+
+  msgBody:
+    name: msgBody
+    description: The body of the message
+    in: body
+    schema:
+      required:
+        - fromUserId
+        - toUserId
+        - text
+      properties:
+        fromUserId:
+          type: integer
+        toUserId:
+          type: integer
+        text:
+          type: string

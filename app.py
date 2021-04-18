@@ -10,8 +10,9 @@ def get_test1(test1_id):
     return {'id': 1, 'name': 'name', 'entered_id': test1_id}
 
 
-def getUserConversation(messageBody):
-    messages = db.session.query(Message).filter_by(fromUserId=messageBody['fromUserId'], toUserId=messageBody['toUserId'])
+def getUserConversation(msgBody):
+    messages = db.session.query(Message).filter_by(fromUserId=msgBody['fromUserId'],
+                                                   toUserId=msgBody['toUserId'])
     json_messages = []
     for m in messages:
         json_messages.append({'fromUserId': m.fromUserId, 'toUserId': m.toUserId, 'text': m.text})
@@ -21,6 +22,13 @@ def getUserConversation(messageBody):
 def editCyclingParty(cyclePartyBody):
     cycleParty = db.session.query(CycleParty).get(cyclePartyBody['id'])
     if cycleParty:
+        partyRoute = db.session.query(Route).get(cyclePartyBody['routeId'])
+        if partyRoute:
+            partyRoute.lngFrom = cycleParty["lngFrom"]
+            partyRoute.latFrom = cycleParty["latFrom"]
+            partyRoute.lngTo = cycleParty["lngTo"]
+            partyRoute.latTo = cycleParty["latTo"]
+            db.session.commit()
         return True
     else:
         return {'error': 'Cycle Party not found'}, 404
