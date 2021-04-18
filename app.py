@@ -39,7 +39,7 @@ def get_user_timeline(user_id):
     post_comments = []
     for post in user_feed:
         for comments in post.comments:
-            post_comments.append({'text' : comments.text})
+            post_comments.append({'commentId': comments.id, 'text': comments.text})
             print(comments.text)
         user_post_feed.append({'userId': post.userId, 'text': post.text, 'comments': post_comments})
         post_comments = []
