@@ -37,23 +37,6 @@ class Post(db.Model):
     comments = db.relationship("Comment", backref='post')
     createdOn = db.Column(db.DateTime, nullable=False)
 
-
-class Comment(db.Model):
-    __tablename__ = 'comments'
-    generatedId = str(uuid.uuid4().hex)
-    id = db.Column(db.String, nullable=False, default=generatedId, primary_key=True)
-    postId = db.Column(db.String, db.ForeignKey('posts.id'))
-    userId = db.Column(db.BigInteger, nullable=False)
-    text = db.Column(db.String, nullable=False)
-    createdOn = db.Column(db.DateTime, nullable=False)
-    generatedId = str(uuid.uuid4().hex)
-    id = db.Column(db.String, nullable=False, default=generatedId, primary_key=True)
-    userId = db.Column(db.BigInteger, nullable=False)
-    text = db.Column(db.String, nullable=False)
-    comments = db.relationship("Comment", backref='post')
-    createdOn = db.Column(db.DateTime, nullable=False)
-
-
 class Comment(db.Model):
     __tablename__ = 'comments'
     generatedId = str(uuid.uuid4().hex)
@@ -107,17 +90,6 @@ class CycleParty(db.Model):
     route = db.Column(db.String, db.ForeignKey('route.id'), nullable=False)
     partyCreatorId = db.Column(db.BigInteger, nullable=False)
     members = db.relationship("CyclePartyMember", backref='post')
-
-
-class CyclePartyMember(db.Model):
-    __tablename__ = 'cycle_party_member'
-    partyId = db.Column(db.String, db.ForeignKey('cycle_party.id'), nullable=False, primary_key=True)
-    userId = db.Column(db.BigInteger, nullable=False, primary_key=True)
-    id = db.Column(db.String, nullable=False, default=generatedId, primary_key=True)
-    route = db.Column(db.String, db.ForeignKey('route.id'), nullable=False)
-    partyCreatorId = db.Column(db.BigInteger, nullable=False)
-    members = db.relationship("CyclePartyMember", backref='post')
-
 
 class CyclePartyMember(db.Model):
     __tablename__ = 'cycle_party_member'
