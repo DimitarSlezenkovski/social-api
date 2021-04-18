@@ -10,7 +10,7 @@ def get_test1(test1_id):
     return {'id': 1, 'name': 'name', 'entered_id': test1_id}
 
 
-def get_user_conversation(messageBody):
+def getUserConversation(messageBody):
     messages = db.session.query(Message).filter_by(fromUserId=messageBody['fromUserId'], toUserId=messageBody['toUserId'])
     json_messages = []
     for m in messages:
@@ -18,7 +18,7 @@ def get_user_conversation(messageBody):
     return {'messages': json_messages}
 
 
-def edit_cycling_party(cyclePartyBody):
+def editCyclingParty(cyclePartyBody):
     cycleParty = db.session.query(CycleParty).get(cyclePartyBody['id'])
     if cycleParty:
         return True
@@ -26,7 +26,7 @@ def edit_cycling_party(cyclePartyBody):
         return {'error': 'Cycle Party not found'}, 404
 
 
-def edit_comment(commentBody):
+def editComment(commentBody):
     comment = db.session.query(Comment).get(commentBody['id'])
     if comment:
         if commentBody['text']:
@@ -37,7 +37,7 @@ def edit_comment(commentBody):
         return {'error': 'Comment not found'}, 404
 
 
-def delete_comment(commentId):
+def deleteComment(commentId):
     comment = db.session.query(Comment).filter_by(id=commentId).one()
     db.session.query(Comment).delete(comment)
     db.session.commit()

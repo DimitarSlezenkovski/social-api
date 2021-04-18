@@ -9,18 +9,85 @@ produces:
   - application/json
 basePath: "/api"
 paths:
-  /test1/{test1_id}:
-    get:
-      tags: [ Test1 ]
-      operationId: app.get_test1
-      summary: Testing endpoint
+/comments/edit:
+    put:
+      tags: [ EditComment ]
+      operationId: app.editComment
+      summary: Editing comment
       parameters:
-        - $ref: '#/parameters/test1_id'
+        - $ref: '#/parameters/postComment'
       responses:
         200:
-          description: Return test1
+          description: OK
         404:
-          description: Does not exist
+          description: Internal server error
+
+/cycledParties/edit:
+    put:
+      tags: [ EditCycleParty]
+      operationId: app.editCycleParty
+      summary: Editing Cycling party
+      parameters:
+        - $ref: '#/parameters/postCycleParty'
+      responses:
+        200:
+          description: OK
+        404:
+          description: Internal server error
+
+
+/comments/delete/{commentId}:
+    delete:
+      tags: [ DeleteComment ]
+      operationId: app.deleteComment
+      summary: Deleting comment
+      parameters:
+        - $ref: '#/parameters/CommentId'
+      responses:
+        200:
+          description: OK
+        404:
+          description: Internal server error
+
+parametars:
+ commentBody:
+    name : commentBody
+    description : This will create a new comment
+    in : body
+    schema :
+      required :
+        - postId
+        - userId
+        - text
+      properties :
+        postId:
+          type: integer
+        userId :
+          type : integer
+        text :
+          type : string
+
+cyclePartyBody :
+    name : cyclePartyBody
+    description : This will create a cycling party
+    in : body
+    schema :
+      required :
+        - routeId
+        - partyCreatorId
+      properties :
+        routeId :
+          type : string
+        partyCreatorId :
+          type : integer
+
+
+commentId:
+    name: commentId
+    description: Comment id
+    in: path
+    type: string
+    required: true
 #  /person/:
 #    post:
 #      tags: [ Person ]
@@ -43,15 +110,6 @@ paths:
 #          description: Return person object
 #        404:
 #          description: Person not found
-parameters:
-  test1_id:
-    name: test1_id
-    description: Test1 unique id
-    in: path
-    type: string
-    required: true
-    pattern: "^[a-zA-Z0-9-]+$"
-
 #  person_body:
 #    name: person_body
 #    description: Test1 unique id
