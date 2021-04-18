@@ -64,10 +64,10 @@ def get_global_feed(user_id):
 
 
 def get_all_user_friend_requests(user_id):
-    reqs = db.session.query(FriendRequest).filter(toUserId=user_id)
+    reqs = db.session.query(FriendRequest).filter_by(toUserId=user_id)
     friend_reqs = []
     for req in reqs:
-        friend_reqs.append({'fromUserId': req.fromUserId, 'toUserId': req.toUserId, 'status': req.status})
+        friend_reqs.append({'fromUserId': req.fromUserId, 'toUserId': req.toUserId, 'status': str(req.status)})
     return {'requests': friend_reqs}
 
 
