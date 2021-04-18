@@ -338,7 +338,7 @@ def deleteComment(commentId):
 
 connexion_app = connexion.App(__name__, specification_dir="./")
 app = connexion_app.app
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:1234@localhost:5432/social-db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:1234@localhost:5432/socialdb'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 connexion_app.add_api("api.yml")
