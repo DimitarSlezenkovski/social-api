@@ -126,6 +126,19 @@ paths:
         404:
           description: Internal server error
 
+  /ecycleservices/add:
+    post:
+      tags: [ AddEcycleService ]
+      operationId: app.addEcycleService
+      summary: Saving Ecycle service location
+      parameters:
+        - $ref: '#/parameters/locationBody'
+      responses:
+        200:
+          description: OK
+        404:
+          description: Internal server error
+
   /ecyclists:
     get:
       tags: [ GetAllUsersLocation ]
