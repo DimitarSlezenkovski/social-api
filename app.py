@@ -13,7 +13,8 @@ def saveUserLocation(locationBody):
     new_location = Location(
         lng=locationBody['lng'],
         lat=locationBody['lat'],
-        userId=locationBody['userId']
+        userId=locationBody['userId'],
+        isCycleService=False
     )
     db.session.add(new_location)
     db.session.commit()
@@ -88,6 +89,15 @@ def getEcycleServices():
             {'id': i.id, 'lat': i.lat, 'lng': i.lng, 'userId': i.userId, 'isCycleService': i.isCycleService})
     return {'locations': json_locations}
 
+def addEcycleService(locationBody):
+    new_location = Location(
+        lng=locationBody['lng'],
+        lat=locationBody['lat'],
+        isCycleService=True
+    )
+    db.session.add(new_location)
+    db.session.commit()
+    return True
 
 def getCycleHistory(userId):
     routes = db.session.query(CycledRoute).all()
