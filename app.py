@@ -1,14 +1,95 @@
+from functools import wraps
 import connexion
 from sqlalchemy import or_
 from flask import jsonify
+from flask import request, abort
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 import json
 import datetime
 from datetime import datetime
+import time
 import math
+import jwt
+import requests
 
 
+#UTILITIES
+
+JWT_SECRET = "MY SECRET"
+JWT_LIFETIME_SECONDS = 600000
+
+SOCIAL_APIKEY = "SOCIAL MS SECRET"
+IS_AUTHENTICATED = False
+
+API_URL = "http://localhost:5000/api/"
+
+def auth_ms():
+    global IS_AUTHENTICATED
+    if IS_AUTHENTICATED == False:
+        resp = requests.post(API_URL+'user/auth_microservice', data = {'apikey': SOCIAL_APIKEY})
+        if(resp.status_code == 200):
+            IS_AUTHENTICATED = True
+        else:
+            return False
+    return True
+
+def has_role(arg):
+    def has_role_inner(fn):
+        @wraps(fn)
+        def decorated_view(*args, **kwargs):
+            try:
+                headers = request.headers
+                if 'AUTHORIZATION' in headers:
+                    token = headers['AUTHORIZATION'].split(' ')[1]
+                    decoded_token = decode_token(token)
+                    if 'admin' in decoded_token['roles']:
+                        return fn(*args, **kwargs)
+                    for role in arg:
+                        if role in decoded_token['roles']:
+                            return fn(*args, **kwargs)
+                    abort(401)
+                return fn(*args, **kwargs)
+            except Exception as e:
+                abort(401)
+        return decorated_view
+    return has_role_inner
+
+def decode_token(token):
+    return jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
+
+def is_same_user(user_id):
+    try:
+        headers = request.headers
+        if 'AUTHORIZATION' in headers:
+            token = headers['AUTHORIZATION'].split(' ')[1]
+            decoded_token = decode_token(token)
+            if user_id == decoded_token['user_id']:
+                return True
+            abort(401)
+    except Exception as e:
+        abort(401)
+
+def get_all_users_details():
+    resp = requests.get(API_URL+'user/all')
+    if resp.status_code == 200:
+        users_list = json.dumps(resp.json())
+        return users_list
+    else:
+        return False
+
+def get_user_details(user_id):
+    resp = requests.get(API_URL+'user/details/'+user_id)
+    if resp.status_code == 200:
+        user = json.dumps(resp.json())
+        return user
+    else:
+        return False
+
+
+#API IMPLEMENTATION
+
+#@has_role(['admin', 'basic_user'])
 def saveUserLocation(locationBody):
     new_location = Location(
         lng=locationBody['lng'],
@@ -20,11 +101,6 @@ def saveUserLocation(locationBody):
     db.session.commit()
     return True
 
-
-# get from user ms
-# def get_all_users_key_value_from_user_ms(users_listBody):
-#    users_list = []
-
 def get_all_user_friends(user_id):
     user_friends_list = db.session.query(Friends).filter_by(user1Id=user_id).all()
     friends_list = []
@@ -32,9 +108,7 @@ def get_all_user_friends(user_id):
         friends_list.append({"user1Id": friend.user1Id, "user2Id": friend.user2Id})
     return {'friends': friends_list}
 
-
 def get_user_timeline(user_id):
-    # user_feed = Post.query.filter_by(userId=user_id).all()
     user_feed = db.session.query(Post).filter_by(userId=user_id).all()
     user_post_feed = []
     post_comments = []
@@ -45,7 +119,6 @@ def get_user_timeline(user_id):
         user_post_feed.append({'userId': post.userId, 'text': post.text, 'comments': post_comments})
         post_comments = []
     return {'timeline': user_post_feed}
-
 
 def get_global_feed(user_id):
     posts = []
@@ -63,7 +136,7 @@ def get_global_feed(user_id):
 
     return {'posts': user_posts}
 
-
+#@has_role(['admin', 'basic_user'])
 def get_all_user_friend_requests(user_id):
     reqs = db.session.query(FriendRequest).filter_by(toUserId=user_id)
     friend_reqs = []
@@ -71,7 +144,7 @@ def get_all_user_friend_requests(user_id):
         friend_reqs.append({'fromUserId': req.fromUserId, 'toUserId': req.toUserId, 'status': str(req.status)})
     return {'requests': friend_reqs}
 
-
+#@has_role(['admin', 'basic_user'])
 def getAllUsersLocation():
     locations = db.session.query(Location).filter_by(isCycleService=False).all()
     json_locations = []
@@ -79,7 +152,6 @@ def getAllUsersLocation():
         json_locations.append(
             {'id': i.id, 'lat': i.lat, 'lng': i.lng, 'userId': i.userId, 'isCycleService': i.isCycleService})
     return {'locations': json_locations}
-
 
 def getEcycleServices():
     locations = db.session.query(Location).filter_by(isCycleService=True).all()
@@ -89,6 +161,7 @@ def getEcycleServices():
             {'id': i.id, 'lat': i.lat, 'lng': i.lng, 'userId': i.userId, 'isCycleService': i.isCycleService})
     return {'locations': json_locations}
 
+#@has_role(['admin', 'basic_user'])
 def addEcycleService(locationBody):
     new_location = Location(
         lng=locationBody['lng'],
@@ -99,6 +172,8 @@ def addEcycleService(locationBody):
     db.session.commit()
     return True
 
+
+#@has_role(['admin', 'basic_user'])
 def getCycleHistory(userId):
     routes = db.session.query(CycledRoute).all()
     json_routes = []
@@ -108,7 +183,7 @@ def getCycleHistory(userId):
              'route': i.route})
     return {'routes': json_routes}
 
-
+#@has_role(['admin', 'basic_user'])
 def editPost(postBody):
     post = db.session.query(Post).get(postBody['id'])
     if post:
@@ -121,7 +196,7 @@ def editPost(postBody):
     else:
         return {'error': 'Post not found'}, 404
 
-
+#@has_role(['admin', 'basic_user'])
 def deletePost(postId):
     post = db.session.query(Post).filter_by(id=postId).one()
     db.session.query(Post).delete(post)
@@ -132,7 +207,7 @@ def deletePost(postId):
     else:
         return True
 
-
+#@has_role(['admin', 'basic_user'])
 def deleteCyclingParty(delPartyBody):
     creatorId = CycleParty.query.filter_by(id=delPartyBody['partyId']).first().partyCreatorId
     if delPartyBody['userId'] == creatorId:
@@ -141,7 +216,7 @@ def deleteCyclingParty(delPartyBody):
         db.session.delete(partyToDelete)
         db.session.commit()
 
-
+#@has_role(['admin', 'basic_user'])
 def addCycledRoute(cycledRouteBody):
     # calculating the distance traveled
     # approximation of the radius of the earth in km
@@ -190,7 +265,7 @@ def addCycledRoute(cycledRouteBody):
     db.session.add(new_cycledRoute)
     db.session.commit()
 
-
+#@has_role(['admin', 'basic_user'])
 def leaveParty(leavePartyBody):
     # TODO : If the party creator decides to leave the party then delete the entire party (I'll do it tmrw)
     partyToLeave = CyclePartyMember.query.filter_by(
@@ -207,7 +282,7 @@ def leaveParty(leavePartyBody):
 
     db.session.commit()
 
-
+#@has_role(['admin', 'basic_user'])
 def createPost(postBody):
     new_post = Post(
         userId=postBody['userId'],
@@ -216,7 +291,7 @@ def createPost(postBody):
     db.session.add(new_post)
     db.session.commit()
 
-
+#@has_role(['admin', 'basic_user'])
 def postComment(commentBody):
     new_comment = Comment(
         postId=commentBody['postId'],
@@ -227,7 +302,7 @@ def postComment(commentBody):
     db.session.add(new_comment)
     db.session.commit()
 
-
+#@has_role(['admin', 'basic_user'])
 def addRoute(routeBody):
     new_route = Route(
         lngFrom=routeBody['lngFrom'],
@@ -238,7 +313,7 @@ def addRoute(routeBody):
     db.session.add(new_route)
     db.session.commit()
 
-
+#@has_role(['admin', 'basic_user'])
 def createCycleParty(cyclePartyBody):
     new_cycleParty = CycleParty(
         route=cyclePartyBody['routeId'],
@@ -254,7 +329,7 @@ def createCycleParty(cyclePartyBody):
 
     db.session.commit()
 
-
+#@has_role(['admin', 'basic_user'])
 def sendMessage(msgBody):
     if msgBody['fromUserId'] != msgBody['toUserId']:
         d = datetime.now()
@@ -266,7 +341,7 @@ def sendMessage(msgBody):
         db.session.add(new_message)
         db.session.commit()
 
-
+#@has_role(['admin', 'basic_user'])
 def sendFriendRequest(friendRequestBody):
     if friendRequestBody['fromUserId'] != friendRequestBody['toUserId']:
         new_friendRequest = FriendRequest(
@@ -275,7 +350,7 @@ def sendFriendRequest(friendRequestBody):
         db.session.add(new_friendRequest)
         db.session.commit()
 
-
+#@has_role(['admin', 'basic_user'])
 def ackFriendRequest(friendBody):
     if friendBody['requestSender'] != friendBody['requestRecepient']:
         if friendBody['resp'] == True:
@@ -287,7 +362,7 @@ def ackFriendRequest(friendBody):
             FriendRequest.query.filter_by(fromUserId=friendBody['requestSender']).delete()
             db.session.commit()
 
-
+#@has_role(['admin', 'basic_user'])
 def getUserConversation(msgBody):
     messages = db.session.query(Message).filter_by(fromUserId=msgBody['fromUserId'],
                                                    toUserId=msgBody['toUserId'])
@@ -296,7 +371,7 @@ def getUserConversation(msgBody):
         json_messages.append({'fromUserId': m.fromUserId, 'toUserId': m.toUserId, 'text': m.text})
     return {'messages': json_messages}
 
-
+#@has_role(['admin', 'basic_user'])
 def editCyclingParty(cyclePartyBody):
     cycleParty = db.session.query(CycleParty).get(cyclePartyBody['id'])
     if cycleParty:
@@ -311,7 +386,7 @@ def editCyclingParty(cyclePartyBody):
     else:
         return {'error': 'Cycle Party not found'}, 404
 
-
+#@has_role(['admin', 'basic_user'])
 def editComment(commentBody):
     comment = db.session.query(Comment).get(commentBody['id'])
     if comment:
@@ -322,7 +397,7 @@ def editComment(commentBody):
     else:
         return {'error': 'Comment not found'}, 404
 
-
+#@has_role(['admin', 'basic_user'])
 def deleteComment(commentId):
     comment = db.session.query(Comment).filter_by(id=commentId).one()
     db.session.query(Comment).delete(comment)
