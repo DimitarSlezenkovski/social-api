@@ -59,14 +59,16 @@ def decode_token(token):
     return jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
 
 def is_same_user(user_id):
-    headers = request.headers
-    if 'AUTHORIZATION' in headers:
-        token = headers['AUTHORIZATION'].split(' ')[1]
-        decoded_token = decode_token(token)
-        if user_id == decoded_token['user_id']:
-            return True
-        else:
-            return False
+    try:
+        headers = request.headers
+        if 'AUTHORIZATION' in headers:
+            token = headers['AUTHORIZATION'].split(' ')[1]
+            decoded_token = decode_token(token)
+            if user_id == decoded_token['user_id']:
+                return True
+            abort(401)
+    except Exception as e:
+        abort(401)
 
 def get_all_users_details():
     resp = requests.get(API_URL+'user/all')
