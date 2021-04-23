@@ -67,7 +67,7 @@ paths:
           description: OK
         404:
           description: User Conversation not found
-  
+
   /friends/{user_id}:
     get:
       tags: [ User friends ]
@@ -205,133 +205,133 @@ paths:
 
   /deleteCyclingParty/:
     post:
-      tags : [ DeleteCyclingParty ]
-      operationId : app.deleteCyclingParty
-      summary : Deleting a cycling party
-      parameters : 
-        - $ref : '#/parameters/delPartyBody'
-      responses : 
-        200 : 
-          description : OK
-        500 : 
-          description : Internal server error
+      tags: [ DeleteCyclingParty ]
+      operationId: app.deleteCyclingParty
+      summary: Deleting a cycling party
+      parameters:
+        - $ref: '#/parameters/delPartyBody'
+      responses:
+        200:
+          description: OK
+        500:
+          description: Internal server error
 
   /addCycledRoute/:
     post:
-      tags : [ AddCycledRoute ]
-      operationId : app.addCycledRoute
-      summary : User adding a cycled route
-      parameters : 
-        - $ref : '#/parameters/cycledRouteBody'
-      responses : 
-        200 : 
-          description : OK
-        500 : 
-          description : Internal server error
+      tags: [ AddCycledRoute ]
+      operationId: app.addCycledRoute
+      summary: User adding a cycled route
+      parameters:
+        - $ref: '#/parameters/cycledRouteBody'
+      responses:
+        200:
+          description: OK
+        500:
+          description: Internal server error
 
   /leaveParty/:
     post:
-      tags : [ LeaveParty ]
-      operationId : app.leaveParty
-      summary : Leaving a cycling party
-      parameters : 
-        - $ref : '#/parameters/leavePartyBody'
-      responses : 
-        200 :
-          description : OK
-        500 :
-          description : Internal server error
+      tags: [ LeaveParty ]
+      operationId: app.leaveParty
+      summary: Leaving a cycling party
+      parameters:
+        - $ref: '#/parameters/leavePartyBody'
+      responses:
+        200:
+          description: OK
+        500:
+          description: Internal server error
 
   /postComment/:
     post:
-      tags : [ PostComment ]
-      operationId : app.postComment
-      summary : Posting a comment to an existing post
-      parameters : 
-          - $ref : '#/parameters/commentBody'
-      responses : 
-        200 : 
-          description : OK
-        500 : 
-          description : Internal server error
+      tags: [ PostComment ]
+      operationId: app.postComment
+      summary: Posting a comment to an existing post
+      parameters:
+        - $ref: '#/parameters/commentBody'
+      responses:
+        200:
+          description: OK
+        500:
+          description: Internal server error
 
   /createPost/:
     post:
-      tags : [ CreatePost ]
-      operationId : app.createPost
-      summary : Creating a new post
-      parameters : 
-        - $ref : '#/parameters/postBody'
-      responses :
-        200 : 
-          description : OK
-        500 : 
-          description : Internal server error
+      tags: [ CreatePost ]
+      operationId: app.createPost
+      summary: Creating a new post
+      parameters:
+        - $ref: '#/parameters/postBody'
+      responses:
+        200:
+          description: OK
+        500:
+          description: Internal server error
 
   /createRoute/:
     post:
-      tags : [ CreateRoute ]
-      operationId : app.addRoute
-      summary : Adding a new route
-      parameters : 
-        - $ref : '#/parameters/routeBody'
-      responses : 
-        200 :
-          description : OK
-        500 : 
-          description : Internal server error
+      tags: [ CreateRoute ]
+      operationId: app.addRoute
+      summary: Adding a new route
+      parameters:
+        - $ref: '#/parameters/routeBody'
+      responses:
+        200:
+          description: OK
+        500:
+          description: Internal server error
 
   /createCycleParty/:
     post:
-      tags : [ CreateCycleParty ]
-      operationId : app.createCycleParty
-      summary : Creating a cycle party
-      parameters :
-        - $ref : '#/parameters/cyclePartyBody'
-      responses : 
-        200 :
-          description : OK
-        500 : 
-          description : Internal server error
+      tags: [ CreateCycleParty ]
+      operationId: app.createCycleParty
+      summary: Creating a cycle party
+      parameters:
+        - $ref: '#/parameters/cyclePartyBody'
+      responses:
+        200:
+          description: OK
+        500:
+          description: Internal server error
 
   /ackFriendRequest/:
     post:
-      tags : [ AcknowledgeFriendRequest ]
-      operationId : app.ackFriendRequest
-      summary : User acknowledging a friend request
-      parameters : 
-        - $ref : '#/parameters/friendBody'
-      responses : 
-        200 :
-          description : OK
-        500 : 
-          description : Internal server error
+      tags: [ AcknowledgeFriendRequest ]
+      operationId: app.ackFriendRequest
+      summary: User acknowledging a friend request
+      parameters:
+        - $ref: '#/parameters/friendBody'
+      responses:
+        200:
+          description: OK
+        500:
+          description: Internal server error
 
   /sendFriendRequest/:
     post:
-      tags : [ FriendRequest ]
-      operationId : app.sendFriendRequest
-      summary : Sending a friend request
-      parameters : 
-        - $ref : '#/parameters/friendRequestBody'
-      responses : 
+      tags: [ FriendRequest ]
+      operationId: app.sendFriendRequest
+      summary: Sending a friend request
+      parameters:
+        - $ref: '#/parameters/friendRequestBody'
+      responses:
         200:
-          description : OK
+          description: OK
         500:
-          description : Internal server error
+          description: Internal server error
 
   /sendMsg/:
     post:
-      tags : [ Message ]
-      operationId : app.sendMessage
-      summary : Sending a message
+      tags: [ Message ]
+      operationId: app.sendMessage
+      summary: Sending a message
       parameters:
-        - $ref : '#/parameters/msgBody'
-      responses : 
+        - $ref: '#/parameters/msgBody'
+      responses:
         200:
-          description : Message successfully sent and saved
+          description: Message successfully sent and saved
         500:
-          description : Internal server error
+          description: Internal server error
 
 parameters:
   commentId:
@@ -345,132 +345,116 @@ parameters:
     name: locationBody
     description: locationBody
     in: body
-    schema : 
-      required : 
+    schema:
+      required:
         - userId
         - lat
         - lng
         - isCycleService
-      properties :
-        userId : 
-          type : integer
-        lat : 
-          type : string
-        lng :
-          type : string
-        isCycleService :
-          type : boolean
-          
+      properties:
+        userId:
+          type: integer
+        lat:
+          type: string
+        lng:
+          type: string
+        isCycleService:
+          type: boolean
+
   user_id:
     name: user_id
     description: User unique id
     in: path
     type: integer
     required: true
-    
+
   userId:
     name: userId
     description: User id
     in: path
     type: integer
     required: true
-    
-  msgBody :
-    name : msgBody
-    description : The body of the message
-    in : body
-    schema :
-      required :
-        - fromUserId
-        - toUserId
-      properties : 
-        fromUserId :
-          type : integer
-        toUserId :
-          type : integer
-        text : 
-          type : string
 
   friendRequestBody:
-    name : friendRequestBody
-    description : The body for a friend request
-    in : body
+    name: friendRequestBody
+    description: The body for a friend request
+    in: body
     schema:
-      required :
+      required:
         - fromUserId
         - toUserId
       properties:
-        fromUserId :
-          type : integer
-        toUserId :
-          type : integer
+        fromUserId:
+          type: integer
+        toUserId:
+          type: integer
 
   friendBody:
-    name : friendBody
-    description : This is used when a user accepts/rejects a friend request
-    in : body
-    schema : 
-      required :
+    name: friendBody
+    description: This is used when a user accepts/rejects a friend request
+    in: body
+    schema:
+      required:
         - requestRecepient
         - requestSender
         - resp
-      properties :
-        requestRecepient :
-          type : integer
-        requestSender :
-          type : integer
-        resp :
-          type : boolean
+      properties:
+        requestRecepient:
+          type: integer
+        requestSender:
+          type: integer
+        resp:
+          type: boolean
 
-  cyclePartyBody : 
-    name : cyclePartyBody
-    description : This is used to create a cycling party
-    in : body
-    schema : 
-      required : 
+  cyclePartyBody:
+    name: cyclePartyBody
+    description: This is used to create a cycling party
+    in: body
+    schema:
+      required:
         - routeId
         - partyCreatorId
-      properties :
-        routeId :
-          type : string
-        partyCreatorId : 
-          type : integer
+      properties:
+        routeId:
+          type: string
+        partyCreatorId:
+          type: integer
 
-  routeBody : 
-    name : routeBody
-    description : This is used to create a route
-    in : body
-    schema : 
-      required : 
-        - lngFrom 
+  routeBody:
+    name: routeBody
+    description: This is used to create a route
+    in: body
+    schema:
+      required:
+        - lngFrom
         - latFrom
         - lngTo
         - latTo
-      properties : 
-        lngFrom : 
-          type : string
-        latFrom : 
-          type : string
-        lngTo : 
-          type : string
-        latTo : 
-          type : string
+      properties:
+        lngFrom:
+          type: string
+        latFrom:
+          type: string
+        lngTo:
+          type: string
+        latTo:
+          type: string
 
   postBody:
-    name : postBody
-    description : This will create a new post (not the http method haha)
-    in : body
-    schema : 
-      required : 
+    name: postBody
+    description: This will create a new post (not the http method haha)
+    in: body
+    schema:
+      required:
         - userId
         - text
-      properties :
-        userId : 
-          type : integer
-        text : 
-          type : string
-        image :
-          type : string
+      properties:
+        userId:
+          type: integer
+        text:
+          type: string
+        image:
+          type: string
 
   postId:
     name: postId
@@ -479,84 +463,100 @@ parameters:
     type: string
     required: true
 
-  commentBody : 
-    name : commentBody
-    description : This will post a comment to an existing post
-    in : body
-    schema : 
-      required : 
+  msgBody:
+    name: msgBody
+    description: The body of the message
+    in: body
+    schema:
+      required:
+        - fromUserId
+        - toUserId
+        - text
+      properties:
+        fromUserId:
+          type: integer
+        toUserId:
+          type: integer
+        text:
+          type: string
+  commentBody:
+    name: commentBody
+    description: This will post a comment to an existing post
+    in: body
+    schema:
+      required:
         - postId
         - userId
         - text
-      properties : 
-        postId :
-          type : string
-        userId :
-          type : integer
-        text : 
-          type : string
-  
-  leavePartyBody : 
-    name : leavePartyBody
-    description : This is used when someone wants to leave a party
-    in : body 
-    schema : 
-      required :
-        - partyId 
-        - userId
-      properties : 
-        partyId : 
-          type : string
-        userId : 
-          type : integer
+      properties:
+        postId:
+          type: string
+        userId:
+          type: integer
+        text:
+          type: string
 
-  cycledRouteBody :
-    name : cycledRouteBody
-    description : This is used when a user adds a cycled route
-    in : body
-    schema : 
-      required :
+  leavePartyBody:
+    name: leavePartyBody
+    description: This is used when someone wants to leave a party
+    in: body
+    schema:
+      required:
+        - partyId
+        - userId
+      properties:
+        partyId:
+          type: string
+        userId:
+          type: integer
+
+  cycledRouteBody:
+    name: cycledRouteBody
+    description: This is used when a user adds a cycled route
+    in: body
+    schema:
+      required:
         - userId
         - route
         - userWeight
         - cycledTime
-      properties : 
-        userId : 
-          type : integer
-        route : 
-          type : string
-        userWeight : 
-          type : string
-        cycledTime : 
-          type : string
+      properties:
+        userId:
+          type: integer
+        route:
+          type: string
+        userWeight:
+          type: string
+        cycledTime:
+          type: string
 
-  delPartyBody : 
-    name : delPartyBody
-    description : This is used to delete a cycling party 
-    in : body
-    schema : 
-      required : 
+  delPartyBody:
+    name: delPartyBody
+    description: This is used to delete a cycling party
+    in: body
+    schema:
+      required:
         - userId
         - partyId
-      properties : 
-        userId : 
-          type : integer
-        partyId : 
-          type : string
+      properties:
+        userId:
+          type: integer
+        partyId:
+          type: string
 
-  delCommentBody : 
-    name : delCommentBody
-    description : This is used to delete a comment
-    in : body
-    schema : 
-      required : 
+  delCommentBody:
+    name: delCommentBody
+    description: This is used to delete a comment
+    in: body
+    schema:
+      required:
         - userId
         - postId
         - commentId
-      properties : 
-        userId : 
-          type : integer
-        commentId : 
-          type : string
-        postId : 
-          type : string
+      properties:
+        userId:
+          type: integer
+        commentId:
+          type: string
+        postId:
+          type: string
