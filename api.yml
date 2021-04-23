@@ -363,7 +363,6 @@ parameters:
       required :
         - fromUserId
         - toUserId
-        - text
       properties : 
         fromUserId :
           type : integer
@@ -460,22 +459,6 @@ parameters:
     type: string
     required: true
 
-  msgBody:
-    name: msgBody
-    description: The body of the message
-    in: body
-    schema:
-      required:
-        - fromUserId
-        - toUserId
-        - text
-      properties:
-        fromUserId:
-          type: integer
-        toUserId:
-          type: integer
-        text:
-          type: string
   commentBody : 
     name : commentBody
     description : This will post a comment to an existing post
