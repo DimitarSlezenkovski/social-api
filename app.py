@@ -287,6 +287,11 @@ def addCycledRoute(cycledRouteBody):
 # @has_role(['admin', 'basic_user'])
 def leaveParty(leavePartyBody):
     # TODO : If the party creator decides to leave the party then delete the entire party (I'll do it tmrw)
+    user_creator = db.session.query(CycleParty).filter(partyCreatorId=leavePartyBody['userId']).one()
+    if leavePartyBody['userId'] == user_creator:
+        partyToDelete = CycleParty.query.filter_by(id=leavePartyBody['partyId']).first()
+        db.session.delete(partyToDelete)
+
     partyToLeave = CyclePartyMember.query.filter_by(
         userId=leavePartyBody['userId'],
         partyId=leavePartyBody['partyId']
