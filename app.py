@@ -188,8 +188,8 @@ def addEcycleService(locationBody):
 
 
 # @has_role(['admin', 'basic_user'])
-def getCycleHistory(userId):
-    routes = db.session.query(CycledRoute).all()
+def getCycleHistory(user_id):
+    routes = db.session.query(CycledRoute).filter(userId=user_id).all()
     json_routes = []
     for i in routes:
         json_routes.append(
@@ -200,7 +200,8 @@ def getCycleHistory(userId):
 
 # @has_role(['admin', 'basic_user'])
 def editPost(postBody):
-    post = db.session.query(Post).get(postBody['id'])
+    # post = db.session.query(Post).get(postBody['id'])
+    post = db.session.query(Post).get(postBody['postId'])
     if post:
         if postBody['text']:
             post.text = postBody['text']
@@ -215,9 +216,9 @@ def editPost(postBody):
 # @has_role(['admin', 'basic_user'])
 def deletePost(postId):
     post = db.session.query(Post).filter_by(id=postId).one()
-    db.session.query(Post).delete(post)
+    db.session.delete(post)
     db.session.commit()
-    isPostPresent = db.session.query(Post).filter_by(id=postId).one()
+    isPostPresent = db.session.query(Post).filter_by(id=postId).one()# ??
     if isPostPresent:
         return False
     else:
@@ -287,10 +288,10 @@ def addCycledRoute(cycledRouteBody):
 # @has_role(['admin', 'basic_user'])
 def leaveParty(leavePartyBody):
     # TODO : If the party creator decides to leave the party then delete the entire party (I'll do it tmrw)
-    user_creator = db.session.query(CycleParty).filter(partyCreatorId=leavePartyBody['userId']).one()
-    if leavePartyBody['userId'] == user_creator:
-        partyToDelete = CycleParty.query.filter_by(id=leavePartyBody['partyId']).first()
-        db.session.delete(partyToDelete)
+    # user_creator = db.session.query(CycleParty).filter(partyCreatorId=leavePartyBody['userId']).one()
+    # if leavePartyBody['userId'] == user_creator.partyCreatorId:
+    #     partyToDelete = CycleParty.query.filter_by(id=leavePartyBody['partyId']).first()
+    #     db.session.delete(partyToDelete)
 
     partyToLeave = CyclePartyMember.query.filter_by(
         userId=leavePartyBody['userId'],
@@ -435,7 +436,7 @@ def editComment(commentBody):
 # @has_role(['admin', 'basic_user'])
 def deleteComment(commentId):
     comment = db.session.query(Comment).filter_by(id=commentId).one()
-    db.session.query(Comment).delete(comment)
+    db.session.delete(comment)
     db.session.commit()
     isCommentPresent = db.session.query(Comment).filter_by(id=commentId).one()
     if isCommentPresent:
