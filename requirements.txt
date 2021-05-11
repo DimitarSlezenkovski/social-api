@@ -4,3 +4,6 @@ connexion[swagger-ui]~=2.5.0
 sqlalchemy~=1.4.9
 PyJWT~=1.7.1
 requests~=2.25.1
+python-consul
+marshmallow
+psycopg2

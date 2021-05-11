@@ -8,3 +8,4 @@ lib/
 *.cfg
 pyvenv.cfg
 .vscode
+data/

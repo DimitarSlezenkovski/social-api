@@ -1,17 +1,15 @@
+import datetime
+import json
+import math
 from functools import wraps
+
 import connexion
-from sqlalchemy import or_
-from flask import jsonify
+import jwt
+import requests
 from flask import request, abort
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-import json
-import datetime
-from datetime import datetime
-import time
-import math
-import jwt
-import requests
+from sqlalchemy import or_
 
 # UTILITIES
 
@@ -31,7 +29,7 @@ def auth_ms():
         if (resp.status_code == 200):
             IS_AUTHENTICATED = True
         else:
-            return False
+            return {"error": "user is not authenticated"}, 404
     return True
 
 
@@ -70,7 +68,7 @@ def is_same_user(user_id):
             token = headers['AUTHORIZATION'].split(' ')[1]
             decoded_token = decode_token(token)
             if user_id == decoded_token['user_id']:
-                return True
+                return {"Message": "OK"}, 200
             abort(401)
     except Exception as e:
         abort(401)
@@ -82,7 +80,7 @@ def get_all_users_details():
         users_list = json.dumps(resp.json())
         return users_list
     else:
-        return False
+        return {"error": "users not found"}, 404
 
 
 def get_user_details(user_id):
@@ -91,7 +89,7 @@ def get_user_details(user_id):
         user = json.dumps(resp.json())
         return user
     else:
-        return False
+        return {"error": "user not found"}, 404
 
 
 # API IMPLEMENTATION
@@ -106,15 +104,19 @@ def saveUserLocation(locationBody):
     )
     db.session.add(new_location)
     db.session.commit()
-    return True
+
+    return {"Message": "OK"}, 200
 
 
 def get_all_user_friends(user_id):
     user_friends_list = db.session.query(Friends).filter_by(user1Id=user_id).all()
+    user_friends_list2 = db.session.query(Friends).filter_by(user2Id=user_id).all()
+    user_friends_list.extend(user_friends_list2)
     friends_list = []
     for friend in user_friends_list:
         friends_list.append({"user1Id": friend.user1Id, "user2Id": friend.user2Id})
-    return {'friends': friends_list}
+
+    return {'friends': friends_list}, 200
 
 
 def get_user_timeline(user_id):
@@ -127,16 +129,19 @@ def get_user_timeline(user_id):
             print(comments.text)
         user_post_feed.append({'userId': post.userId, 'text': post.text, 'comments': post_comments})
         post_comments = []
-    return {'timeline': user_post_feed}
+    return {'timeline': user_post_feed}, 200
 
 
 def get_global_feed(user_id):
     posts = []
     user_posts = []
-    friends = db.session.query(Friends).filter(or_(user1Id=user_id, user2Id=user_id)).all()
+    friends = db.session.query(Friends).filter_by(user1Id=user_id).all()
+    friends2 = db.session.query(Friends).filter_by(user2Id=user_id).all()
+    friends.extend(friends2)
+
     for friend in friends:
-        friend_id = friend['user1Id']
-        friend_id2 = friend['user2Id']
+        friend_id = friend.user1Id
+        friend_id2 = friend.user2Id
         if friend_id != user_id:
             posts = db.session.query(Post).filter_by(userId=friend_id).all()
         if friend_id2 != user_id:
@@ -144,7 +149,7 @@ def get_global_feed(user_id):
         for post in posts:
             user_posts.append({'userId': post.userId, 'text': post.text, 'comments': post.comments})
 
-    return {'posts': user_posts}
+    return {'posts': user_posts}, 200
 
 
 # @has_role(['admin', 'basic_user'])
@@ -153,7 +158,7 @@ def get_all_user_friend_requests(user_id):
     friend_reqs = []
     for req in reqs:
         friend_reqs.append({'fromUserId': req.fromUserId, 'toUserId': req.toUserId, 'status': str(req.status)})
-    return {'requests': friend_reqs}
+    return {'requests': friend_reqs}, 200
 
 
 # @has_role(['admin', 'basic_user'])
@@ -163,7 +168,7 @@ def getAllUsersLocation():
     for i in locations:
         json_locations.append(
             {'id': i.id, 'lat': i.lat, 'lng': i.lng, 'userId': i.userId, 'isCycleService': i.isCycleService})
-    return {'locations': json_locations}
+    return {'locations': json_locations}, 200
 
 
 def getEcycleServices():
@@ -172,7 +177,7 @@ def getEcycleServices():
     for i in locations:
         json_locations.append(
             {'id': i.id, 'lat': i.lat, 'lng': i.lng, 'userId': i.userId, 'isCycleService': i.isCycleService})
-    return {'locations': json_locations}
+    return {'locations': json_locations}, 200
 
 
 # @has_role(['admin', 'basic_user'])
@@ -180,16 +185,17 @@ def addEcycleService(locationBody):
     new_location = Location(
         lng=locationBody['lng'],
         lat=locationBody['lat'],
+        userId=locationBody['userId'],
         isCycleService=True
     )
     db.session.add(new_location)
     db.session.commit()
-    return True
+    return {"Message": "OK"}, 200
 
 
 # @has_role(['admin', 'basic_user'])
-def getCycleHistory(user_id):
-    routes = db.session.query(CycledRoute).filter(userId=user_id).all()
+def getCycleHistory(userId):
+    routes = db.session.query(CycledRoute).filter_by(userId=userId).all()
     json_routes = []
     for i in routes:
         json_routes.append(
@@ -208,7 +214,7 @@ def editPost(postBody):
         if postBody['image']:
             post.image = postBody['image']
         db.session.commit()
-        return True
+        return {"Message": "OK"}, 200
     else:
         return {'error': 'Post not found'}, 404
 
@@ -218,21 +224,26 @@ def deletePost(postId):
     post = db.session.query(Post).filter_by(id=postId).one()
     db.session.delete(post)
     db.session.commit()
-    isPostPresent = db.session.query(Post).filter_by(id=postId).one()# ??
-    if isPostPresent:
-        return False
-    else:
-        return True
+    # isPostPresent = db.session.query(Post).filter_by(id=postId).one()  # ??
+    # if isPostPresent:
+    #     return {"error": "Post still exists"}, 404
+    # else:
+    return {"Message": "OK"}, 200
 
 
 # @has_role(['admin', 'basic_user'])
 def deleteCyclingParty(delPartyBody):
-    creatorId = CycleParty.query.filter_by(id=delPartyBody['partyId']).first().partyCreatorId
-    if delPartyBody['userId'] == creatorId:
+    creator = CycleParty.query.filter_by(id=delPartyBody['partyId']).first()
+    if not creator:
+        return {"Error": "does not exist"}, 404
+    if delPartyBody['userId'] == creator.partyCreatorId:
         partyToDelete = CycleParty.query.filter_by(id=delPartyBody['partyId']).first()
         CyclePartyMember.query.filter_by(partyId=delPartyBody['partyId']).delete()
         db.session.delete(partyToDelete)
         db.session.commit()
+        return {"Message": "OK"}, 200
+    else:
+        return {"Message": "Only the creator can delete the party"}, 404
 
 
 # @has_role(['admin', 'basic_user'])
@@ -272,7 +283,7 @@ def addCycledRoute(cycledRouteBody):
 
     burnedCalories = ((MET * float(cycledRouteBody['userWeight']) * 3.5) / 200) * float(cycledRouteBody['cycledTime'])
 
-    new_cycledRoute = CycledRoute(
+    cycledRoute = CycledRoute(
         userId=cycledRouteBody['userId'],
         distanceTraveled=str(distance),
         userWeight=cycledRouteBody['userWeight'],
@@ -281,8 +292,10 @@ def addCycledRoute(cycledRouteBody):
         route=cycledRouteBody['route']
     )
 
-    db.session.add(new_cycledRoute)
+    db.session.add(cycledRoute)
     db.session.commit()
+
+    return {"Message": "OK"}, 200
 
 
 # @has_role(['admin', 'basic_user'])
@@ -297,6 +310,8 @@ def leaveParty(leavePartyBody):
         userId=leavePartyBody['userId'],
         partyId=leavePartyBody['partyId']
     ).first()
+    if not partyToLeave:
+        return {"Message": "Party not found"}, 404
     db.session.delete(partyToLeave)
 
     # check if the party is now empty, if it is delete it from the db
@@ -306,16 +321,19 @@ def leaveParty(leavePartyBody):
         db.session.delete(partyToDelete)
 
     db.session.commit()
+    return {"Message": "OK"}, 200
 
 
 # @has_role(['admin', 'basic_user'])
 def createPost(postBody):
     new_post = Post(
         userId=postBody['userId'],
+        image=postBody['image'],
         text=postBody['text'],
         createdOn=datetime.now())
     db.session.add(new_post)
     db.session.commit()
+    return {"Message": "OK"}, 200
 
 
 # @has_role(['admin', 'basic_user'])
@@ -329,6 +347,8 @@ def postComment(commentBody):
     db.session.add(new_comment)
     db.session.commit()
 
+    return {"Message": "OK"}, 200
+
 
 # @has_role(['admin', 'basic_user'])
 def addRoute(routeBody):
@@ -340,6 +360,8 @@ def addRoute(routeBody):
     )
     db.session.add(new_route)
     db.session.commit()
+
+    return {"Message": "OK"}, 200
 
 
 # @has_role(['admin', 'basic_user'])
@@ -358,6 +380,8 @@ def createCycleParty(cyclePartyBody):
 
     db.session.commit()
 
+    return {"Message": "OK"}, 200
+
 
 # @has_role(['admin', 'basic_user'])
 def sendMessage(msgBody):
@@ -371,6 +395,8 @@ def sendMessage(msgBody):
         db.session.add(new_message)
         db.session.commit()
 
+        return {"Message": "OK"}, 200
+
 
 # @has_role(['admin', 'basic_user'])
 def sendFriendRequest(friendRequestBody):
@@ -380,6 +406,8 @@ def sendFriendRequest(friendRequestBody):
             toUserId=friendRequestBody['toUserId'])
         db.session.add(new_friendRequest)
         db.session.commit()
+        return {"Message": "OK"}, 200
+    return {"Message": "You can't add yourself as a friend"}, 404
 
 
 # @has_role(['admin', 'basic_user'])
@@ -394,6 +422,8 @@ def ackFriendRequest(friendBody):
             FriendRequest.query.filter_by(fromUserId=friendBody['requestSender']).delete()
             db.session.commit()
 
+    return {"Message": "OK"}, 200
+
 
 # @has_role(['admin', 'basic_user'])
 def getUserConversation(msgBody):
@@ -406,29 +436,25 @@ def getUserConversation(msgBody):
 
 
 # @has_role(['admin', 'basic_user'])
-def editCyclingParty(cyclePartyBody):
-    cycleParty = db.session.query(CycleParty).get(cyclePartyBody['id'])
+def editCyclingParty(cyclePartyEditBody):
+    cycleParty = db.session.query(CycleParty).get(cyclePartyEditBody['id'])
     if cycleParty:
-        partyRoute = db.session.query(Route).get(cyclePartyBody['routeId'])
-        if partyRoute:
-            partyRoute.lngFrom = cycleParty["lngFrom"]
-            partyRoute.latFrom = cycleParty["latFrom"]
-            partyRoute.lngTo = cycleParty["lngTo"]
-            partyRoute.latTo = cycleParty["latTo"]
-            db.session.commit()
-        return True
+        cycleParty.route = cyclePartyEditBody['routeId']
+        cycleParty.partyCreatorId = cyclePartyEditBody['partyCreatorId']
+        db.session.commit()
+        return {"Message": "OK"}, 200
     else:
         return {'error': 'Cycle Party not found'}, 404
 
 
 # @has_role(['admin', 'basic_user'])
 def editComment(commentBody):
-    comment = db.session.query(Comment).get(commentBody['id'])
+    comment = db.session.query(Comment).get(commentBody['postId'])
     if comment:
         if commentBody['text']:
             comment.text = commentBody['text']
         db.session.commit()
-        return True
+        return {"Message": "OK"}, 200
     else:
         return {'error': 'Comment not found'}, 404
 
@@ -438,16 +464,16 @@ def deleteComment(commentId):
     comment = db.session.query(Comment).filter_by(id=commentId).one()
     db.session.delete(comment)
     db.session.commit()
-    isCommentPresent = db.session.query(Comment).filter_by(id=commentId).one()
-    if isCommentPresent:
-        return False
-    else:
-        return True
+    # isCommentPresent = db.session.query(Comment).filter_by(id=commentId).one()
+    # if not isCommentPresent:
+    #     return {'error': 'Comment still exists'}, 404
+    # else:
+    return {"Message": "OK"}, 200
 
 
 connexion_app = connexion.App(__name__, specification_dir="./")
 app = connexion_app.app
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/social-db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@postgres:5432/socialdb'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 connexion_app.add_api("api.yml")

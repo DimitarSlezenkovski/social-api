@@ -35,7 +35,7 @@ paths:
       operationId: app.editCyclingParty
       summary: Editing Cycling party
       parameters:
-        - $ref: '#/parameters/cyclePartyBody'
+        - $ref: '#/parameters/cyclePartyEditBody'
       responses:
         200:
           description: OK
@@ -183,7 +183,7 @@ paths:
       operationId: app.editPost
       summary: Editing post
       parameters:
-        - $ref: '#/parameters/postBody'
+        - $ref: '#/parameters/postEditBody'
       responses:
         200:
           description: OK
@@ -338,7 +338,7 @@ parameters:
     name: commentId
     description: Comment id
     in: path
-    type: string
+    type: integer
     required: true
 
   locationBody:
@@ -416,7 +416,24 @@ parameters:
         - partyCreatorId
       properties:
         routeId:
-          type: string
+          type: integer
+        partyCreatorId:
+          type: integer
+
+  cyclePartyEditBody:
+    name: cyclePartyEditBody
+    description: This is used to create a cycling party
+    in: body
+    schema:
+      required:
+        - id
+        - routeId
+        - partyCreatorId
+      properties:
+        id:
+          type: integer
+        routeId:
+          type: integer
         partyCreatorId:
           type: integer
 
@@ -456,11 +473,30 @@ parameters:
         image:
           type: string
 
+  postEditBody:
+    name: postBody
+    description: This will create a new Post
+    in: body
+    schema:
+      required:
+        - postId
+        - userId
+        - text
+      properties:
+        postId:
+          type: integer
+        userId:
+          type: integer
+        text:
+          type: string
+        image:
+          type: string
+
   postId:
     name: postId
     description: Post id
     in: path
-    type: string
+    type: integer
     required: true
 
   msgBody:
@@ -479,6 +515,21 @@ parameters:
           type: integer
         text:
           type: string
+
+#  friendsMsgBody:
+#    name: friendsMsgBody
+#    description: The friends id msg body
+#    in: body
+#    schema:
+#      required:
+#        - fromUserId
+#        - toUserId
+#      properties:
+#        fromUserId:
+#          type: integer
+#        toUserId:
+#          type: integer
+
   commentBody:
     name: commentBody
     description: This will post a comment to an existing post
@@ -490,7 +541,7 @@ parameters:
         - text
       properties:
         postId:
-          type: string
+          type: integer
         userId:
           type: integer
         text:
@@ -506,7 +557,7 @@ parameters:
         - userId
       properties:
         partyId:
-          type: string
+          type: integer
         userId:
           type: integer
 
@@ -524,7 +575,7 @@ parameters:
         userId:
           type: integer
         route:
-          type: string
+          type: integer
         userWeight:
           type: string
         cycledTime:
@@ -542,7 +593,7 @@ parameters:
         userId:
           type: integer
         partyId:
-          type: string
+          type: integer
 
   delCommentBody:
     name: delCommentBody
@@ -559,4 +610,4 @@ parameters:
         commentId:
           type: string
         postId:
-          type: string
+          type: integer
