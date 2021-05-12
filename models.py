@@ -73,7 +73,7 @@ class CycledRoute(db.Model):
 
     id = db.Column(db.Integer, nullable=False, primary_key=True)
     # the userId here is needed to see each user's cycled routes
-    userId = db.Column(db.BigInteger, nullable=False, primary_key=True)
+    userId = db.Column(db.BigInteger, nullable=False)
     distanceTraveled = db.Column(db.String, nullable=False)
     # these two properties are used to determine the burned calories
     userWeight = db.Column(db.String, nullable=False)

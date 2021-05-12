@@ -2,6 +2,12 @@ version: '3.7'
 
 services:
 
+  consul:
+    image: consul
+    container_name: consul
+    ports:
+      - "8500:8500"
+
   postgres:
     image: postgres:13.1
     environment:

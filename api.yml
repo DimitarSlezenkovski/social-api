@@ -55,13 +55,22 @@ paths:
         404:
           description: Comment not found
 
-  /messages:
+  /messages/{fromUserId}/{toUserId}:
     get:
       tags: [ GetUserConversation ]
       operationId: app.getUserConversation
       summary: Getting all user conversations
       parameters:
-        - $ref: '#/parameters/msgBody'
+        - name: fromUserId
+          in: path
+          description: 'fromUserId'
+          required: true
+          type: integer
+        - name: toUserId
+          in: path
+          description: 'toUserId'
+          required: true
+          type: integer
       responses:
         200:
           description: OK
@@ -499,6 +508,20 @@ parameters:
     type: integer
     required: true
 
+#  fromUserId:
+#    name: fromUserId
+#    description: FromUserId
+#    in: path
+#    type: integer
+#    required: true
+
+#  toUserId:
+#    name: toUserId
+#    description: ToUserId
+#    in: path
+#    type: integer
+#    required: true
+
   msgBody:
     name: msgBody
     description: The body of the message
@@ -515,20 +538,6 @@ parameters:
           type: integer
         text:
           type: string
-
-#  friendsMsgBody:
-#    name: friendsMsgBody
-#    description: The friends id msg body
-#    in: body
-#    schema:
-#      required:
-#        - fromUserId
-#        - toUserId
-#      properties:
-#        fromUserId:
-#          type: integer
-#        toUserId:
-#          type: integer
 
   commentBody:
     name: commentBody

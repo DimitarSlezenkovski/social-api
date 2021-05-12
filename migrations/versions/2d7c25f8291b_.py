@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 811bea498c46
+Revision ID: 2d7c25f8291b
 Revises: 
-Create Date: 2021-05-11 14:11:47.597627
+Create Date: 2021-05-12 16:34:38.687865
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '811bea498c46'
+revision = '2d7c25f8291b'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -33,7 +33,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('lng', sa.String(), nullable=False),
     sa.Column('lat', sa.String(), nullable=False),
-    sa.Column('userId', sa.BigInteger(), nullable=False),
+    sa.Column('userId', sa.BigInteger(), nullable=True),
     sa.Column('isCycleService', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
@@ -85,7 +85,7 @@ def upgrade():
     sa.Column('caloriesBurned', sa.BigInteger(), nullable=True),
     sa.Column('route', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['route'], ['route.id'], ),
-    sa.PrimaryKeyConstraint('id', 'userId')
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('cycle_party_member',
     sa.Column('partyId', sa.Integer(), nullable=False),

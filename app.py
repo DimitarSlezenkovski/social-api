@@ -2,7 +2,7 @@ import datetime
 import json
 import math
 from functools import wraps
-
+import pickle
 import connexion
 import jwt
 import requests
@@ -10,7 +10,7 @@ from flask import request, abort
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import or_
-
+from consul import Consul, Check
 # UTILITIES
 
 JWT_SECRET = "MY SECRET"
@@ -20,6 +20,35 @@ SOCIAL_APIKEY = "SOCIAL MS SECRET"
 IS_AUTHENTICATED = False
 
 API_URL = "http://localhost:5000/api/"
+
+CONSUL_PORT = 8500
+SERVICE_NAME = 'social-ms'
+SERVICE_PORT = 5008
+
+
+
+def register_to_consul():
+    consul = Consul(host='consul', port=CONSUL_PORT)
+
+    agent = consul.agent
+
+    service = agent.service
+
+    check = Check.http(f"http://{SERVICE_NAME}:{SERVICE_PORT}/api/ui", interval="10s", timeout="5s", deregister="1s")
+
+    service.register(SERVICE_NAME, service_id=SERVICE_NAME, port=SERVICE_PORT, check=check)
+
+
+def get_service(service_id):
+    consul = Consul(host="consul", port=CONSUL_PORT)
+
+    agent = consul.agent
+
+    service_list = agent.services()
+
+    service_info = service_list[service_id]
+
+    return service_info['Address'], service_info['Port']
 
 
 def auth_ms():
@@ -94,7 +123,7 @@ def get_user_details(user_id):
 
 # API IMPLEMENTATION
 
-# @has_role(['admin', 'basic_user'])
+@has_role(['admin', 'basic_user'])
 def saveUserLocation(locationBody):
     new_location = Location(
         lng=locationBody['lng'],
@@ -152,7 +181,7 @@ def get_global_feed(user_id):
     return {'posts': user_posts}, 200
 
 
-# @has_role(['admin', 'basic_user'])
+@has_role(['admin', 'basic_user'])
 def get_all_user_friend_requests(user_id):
     reqs = db.session.query(FriendRequest).filter_by(toUserId=user_id)
     friend_reqs = []
@@ -161,7 +190,7 @@ def get_all_user_friend_requests(user_id):
     return {'requests': friend_reqs}, 200
 
 
-# @has_role(['admin', 'basic_user'])
+@has_role(['admin', 'basic_user'])
 def getAllUsersLocation():
     locations = db.session.query(Location).filter_by(isCycleService=False).all()
     json_locations = []
@@ -180,7 +209,7 @@ def getEcycleServices():
     return {'locations': json_locations}, 200
 
 
-# @has_role(['admin', 'basic_user'])
+@has_role(['admin', 'basic_user'])
 def addEcycleService(locationBody):
     new_location = Location(
         lng=locationBody['lng'],
@@ -193,7 +222,7 @@ def addEcycleService(locationBody):
     return {"Message": "OK"}, 200
 
 
-# @has_role(['admin', 'basic_user'])
+@has_role(['admin', 'basic_user'])
 def getCycleHistory(userId):
     routes = db.session.query(CycledRoute).filter_by(userId=userId).all()
     json_routes = []
@@ -204,7 +233,7 @@ def getCycleHistory(userId):
     return {'routes': json_routes}
 
 
-# @has_role(['admin', 'basic_user'])
+@has_role(['admin', 'basic_user'])
 def editPost(postBody):
     # post = db.session.query(Post).get(postBody['id'])
     post = db.session.query(Post).get(postBody['postId'])
@@ -219,7 +248,7 @@ def editPost(postBody):
         return {'error': 'Post not found'}, 404
 
 
-# @has_role(['admin', 'basic_user'])
+@has_role(['admin', 'basic_user'])
 def deletePost(postId):
     post = db.session.query(Post).filter_by(id=postId).one()
     db.session.delete(post)
@@ -231,7 +260,7 @@ def deletePost(postId):
     return {"Message": "OK"}, 200
 
 
-# @has_role(['admin', 'basic_user'])
+@has_role(['admin', 'basic_user'])
 def deleteCyclingParty(delPartyBody):
     creator = CycleParty.query.filter_by(id=delPartyBody['partyId']).first()
     if not creator:
@@ -246,7 +275,7 @@ def deleteCyclingParty(delPartyBody):
         return {"Message": "Only the creator can delete the party"}, 404
 
 
-# @has_role(['admin', 'basic_user'])
+@has_role(['admin', 'basic_user'])
 def addCycledRoute(cycledRouteBody):
     # calculating the distance traveled
     # approximation of the radius of the earth in km
@@ -298,7 +327,7 @@ def addCycledRoute(cycledRouteBody):
     return {"Message": "OK"}, 200
 
 
-# @has_role(['admin', 'basic_user'])
+@has_role(['admin', 'basic_user'])
 def leaveParty(leavePartyBody):
     # TODO : If the party creator decides to leave the party then delete the entire party (I'll do it tmrw)
     # user_creator = db.session.query(CycleParty).filter(partyCreatorId=leavePartyBody['userId']).one()
@@ -324,7 +353,7 @@ def leaveParty(leavePartyBody):
     return {"Message": "OK"}, 200
 
 
-# @has_role(['admin', 'basic_user'])
+@has_role(['admin', 'basic_user'])
 def createPost(postBody):
     new_post = Post(
         userId=postBody['userId'],
@@ -336,7 +365,7 @@ def createPost(postBody):
     return {"Message": "OK"}, 200
 
 
-# @has_role(['admin', 'basic_user'])
+@has_role(['admin', 'basic_user'])
 def postComment(commentBody):
     new_comment = Comment(
         postId=commentBody['postId'],
@@ -350,7 +379,7 @@ def postComment(commentBody):
     return {"Message": "OK"}, 200
 
 
-# @has_role(['admin', 'basic_user'])
+@has_role(['admin', 'basic_user'])
 def addRoute(routeBody):
     new_route = Route(
         lngFrom=routeBody['lngFrom'],
@@ -364,7 +393,7 @@ def addRoute(routeBody):
     return {"Message": "OK"}, 200
 
 
-# @has_role(['admin', 'basic_user'])
+@has_role(['admin', 'basic_user'])
 def createCycleParty(cyclePartyBody):
     new_cycleParty = CycleParty(
         route=cyclePartyBody['routeId'],
@@ -383,7 +412,7 @@ def createCycleParty(cyclePartyBody):
     return {"Message": "OK"}, 200
 
 
-# @has_role(['admin', 'basic_user'])
+@has_role(['admin', 'basic_user'])
 def sendMessage(msgBody):
     if msgBody['fromUserId'] != msgBody['toUserId']:
         d = datetime.now()
@@ -398,7 +427,7 @@ def sendMessage(msgBody):
         return {"Message": "OK"}, 200
 
 
-# @has_role(['admin', 'basic_user'])
+@has_role(['admin', 'basic_user'])
 def sendFriendRequest(friendRequestBody):
     if friendRequestBody['fromUserId'] != friendRequestBody['toUserId']:
         new_friendRequest = FriendRequest(
@@ -410,7 +439,7 @@ def sendFriendRequest(friendRequestBody):
     return {"Message": "You can't add yourself as a friend"}, 404
 
 
-# @has_role(['admin', 'basic_user'])
+@has_role(['admin', 'basic_user'])
 def ackFriendRequest(friendBody):
     if friendBody['requestSender'] != friendBody['requestRecepient']:
         if friendBody['resp'] == True:
@@ -425,17 +454,17 @@ def ackFriendRequest(friendBody):
     return {"Message": "OK"}, 200
 
 
-# @has_role(['admin', 'basic_user'])
-def getUserConversation(msgBody):
-    messages = db.session.query(Message).filter_by(fromUserId=msgBody['fromUserId'],
-                                                   toUserId=msgBody['toUserId'])
+@has_role(['admin', 'basic_user'])
+def getUserConversation(fromUserId, toUserId):
+    messages = db.session.query(Message).filter_by(fromUserId=fromUserId,
+                                                   toUserId=toUserId)
     json_messages = []
     for m in messages:
         json_messages.append({'fromUserId': m.fromUserId, 'toUserId': m.toUserId, 'text': m.text})
     return {'messages': json_messages}
 
 
-# @has_role(['admin', 'basic_user'])
+@has_role(['admin', 'basic_user'])
 def editCyclingParty(cyclePartyEditBody):
     cycleParty = db.session.query(CycleParty).get(cyclePartyEditBody['id'])
     if cycleParty:
@@ -447,7 +476,7 @@ def editCyclingParty(cyclePartyEditBody):
         return {'error': 'Cycle Party not found'}, 404
 
 
-# @has_role(['admin', 'basic_user'])
+@has_role(['admin', 'basic_user'])
 def editComment(commentBody):
     comment = db.session.query(Comment).get(commentBody['postId'])
     if comment:
@@ -459,13 +488,15 @@ def editComment(commentBody):
         return {'error': 'Comment not found'}, 404
 
 
-# @has_role(['admin', 'basic_user'])
+@has_role(['admin', 'basic_user'])
 def deleteComment(commentId):
     comment = db.session.query(Comment).filter_by(id=commentId).one()
     db.session.delete(comment)
     db.session.commit()
-    # isCommentPresent = db.session.query(Comment).filter_by(id=commentId).one()
+    # isCommentPresent = db.session.query(Comment).filter_by(id=commentId)
     # if not isCommentPresent:
+    #     return {"Message": "OK"}, 200
+    # elif isCommentPresent is None:
     #     return {'error': 'Comment still exists'}, 404
     # else:
     return {"Message": "OK"}, 200
@@ -479,6 +510,8 @@ migrate = Migrate(app, db)
 connexion_app.add_api("api.yml")
 
 from models import *
+
+register_to_consul()
 
 if __name__ == "__main__":
     connexion_app.run(host='0.0.0.0', port=5000, debug=True)
