@@ -7,6 +7,7 @@ import connexion
 import jwt
 import requests
 import socket
+import netifaces
 from flask import request, abort
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -23,8 +24,8 @@ IS_AUTHENTICATED = False
 API_URL = "http://localhost:5000/api/"
 
 CONSUL_PORT = 8500
-SERVICE_NAME = 'social-ms'
-SERVICE_PORT = 5008
+SERVICE_NAME = 'social'
+SERVICE_PORT = 5000
 
 
 
@@ -35,7 +36,7 @@ def register_to_consul():
 
     service = agent.service
 
-    check = Check.http(f"http://{SERVICE_NAME}:{SERVICE_PORT}/api/ui", interval="10s", timeout="5s", deregister="1s")
+    check = Check.http(f"http://{SERVICE_NAME}:{SERVICE_PORT}/api/social/ui", interval="10s", timeout="5s", deregister="1s")
 
     service.register(SERVICE_NAME, service_id=SERVICE_NAME, port=SERVICE_PORT, check=check)
 
