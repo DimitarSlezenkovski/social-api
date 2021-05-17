@@ -6,6 +6,7 @@ import pickle
 import connexion
 import jwt
 import requests
+import socket
 from flask import request, abort
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
